@@ -3,3 +3,5 @@ node_modules/
 .env.*
 .claude/settings.local.json
 .vscode/settings.json
+# real run log, written locally by the orchestrator
+data/events.jsonl

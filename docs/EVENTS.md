@@ -45,4 +45,4 @@ One JSON object per line, appended by the orchestrator (or by any agent hook). T
 ```
 
 ## Live mode
-Serve the `office/` folder and point the orchestrator's `--log` at `office/data/events.jsonl`. The office polls that file every 2 s and plays new lines in real time (`index.html?live=1`).
+Serve the `office/` folder and point the orchestrator's `--log` at `office/data/events.jsonl`. The office polls that file every 2 s and plays new lines in real time. This is the default (`index.html`); `index.html?replay` plays `data/sample-run.jsonl` instead. On open, only an unfinished run (a `run_start` with no `run_end` after it) is picked up; finished runs are skipped.

@@ -5,7 +5,9 @@ import { buildWorld, ZONES } from './world.js';
 import { Character, idleTick } from './staff.js';
 
 const params = new URLSearchParams(location.search);
-const LIVE = params.has('live');
+// Default: watch the real event log and stay idle until an order (run_start) arrives.
+// The sample run only plays when asked for with ?replay.
+const LIVE = !params.has('replay');
 const LOG = params.get('log') || (LIVE ? 'data/events.jsonl' : 'data/sample-run.jsonl');
 
 // ---------- renderer, scene, camera ----------
@@ -53,7 +55,7 @@ staffData.visitors.forEach((v) => {
 });
 
 // ---------- run state ----------
-const run = { id: '-', template: '-', usd: 0, status: 'idle', stage: -1, budgetMsg: '' };
+const run = { id: '-', template: '-', usd: 0, status: 'idle · waiting for an order', stage: -1, budgetMsg: '' };
 const STAGES = ['Riset', 'Naskah', 'Kritik', 'Animasi', 'Rekam', 'Render', 'Tayang'];
 const stageOf = { researcher: 0, scriptwriter: 1, critic: 2, animator: 3, ulza: 4, aina: 4, ops: 5 };
 const feed = [];
@@ -148,7 +150,7 @@ function apply(ev) {
         r.goTo(ZONES.screen.ring[i], { pose: 'stand', yaw: Math.PI, then: () => { r.setIcon('gather'); r.celebrate = 1.5; } });
         r.thought = ev.summary || 'Nonton hasil akhir';
       });
-      setTimeout(() => roster.forEach((r) => { r.busy = false; r.idleTimer = 2 + Math.random() * 6; }), 12000);
+      setTimeout(() => { roster.forEach((r) => { r.busy = false; r.idleTimer = 2 + Math.random() * 6; }); if (LIVE) run.status = 'idle · waiting for an order'; }, 12000);
       break;
   }
 }
@@ -157,19 +159,33 @@ function apply(ev) {
 let events = [], cursor = 0, clock = 0, playing = true, speed = Number(params.get('speed') || 4);
 const speedNow = () => (LIVE ? 1 : speed);
 function parseJSONL(txt) { return txt.split('\n').map((l) => l.trim()).filter(Boolean).map((l) => { try { return JSON.parse(l); } catch { return null; } }).filter(Boolean); }
+let firstLoad = true;
 async function loadLog() {
   try {
-    const txt = await (await fetch(LOG + '?_=' + Date.now())).text();
-    const all = parseJSONL(txt);
+    const r = await fetch(LOG + '?_=' + Date.now());
+    const all = r.ok ? parseJSONL(await r.text()) : [];
     if (LIVE) {
-      // live: play new lines as they arrive
-      if (all.length > events.length) { const fresh = all.slice(events.length); events = all; fresh.forEach(apply); }
-    } else {
+      let fresh = all.slice(events.length);
+      if (firstLoad) {
+        // Only an unfinished order is picked up on open; finished runs stay in the past.
+        let start = -1;
+        all.forEach((e, i) => { if (e.type === 'run_start') start = i; });
+        const open = start >= 0 && !all.slice(start).some((e) => e.type === 'run_end');
+        fresh = open ? all.slice(start) : [];
+        if (!open && start >= 0) {
+          const end = [...all].reverse().find((e) => e.type === 'run_end');
+          feed.unshift(`Last order ${all[start].run} finished${end?.summary ? ' · ' + end.summary : ''}`);
+        }
+      }
+      events = all; fresh.forEach(apply);
+    } else if (r.ok) {
       events = all.sort((x, y) => x.t - y.t);
-    }
-  } catch (e) { feed.unshift('Log not found: ' + LOG); }
+    } else feed.unshift('Log not found: ' + LOG);
+  } catch (e) { if (!LIVE) feed.unshift('Log not found: ' + LOG); }
+  firstLoad = false;
 }
 await loadLog();
+if (LIVE && !feed.length) feed.unshift('Staff are idle. Waiting for an order.');
 if (LIVE) setInterval(loadLog, 2000);
 function restart() {
   location.reload();
@@ -191,7 +207,7 @@ function hud() {
   $('meter').classList.toggle('flash', performance.now() < flashUntil);
   $('usd').textContent = `$${run.usd.toFixed(2)} / $${CAP.toFixed(2)}`;
   $('budgetMsg').textContent = run.budgetMsg;
-  $('clock').textContent = LIVE ? 'LIVE' : `${fmtT(clock)} / ${fmtT(events.length ? events[events.length - 1].t : 0)}`;
+  $('clock').textContent = LIVE ? (run.status === 'running' ? 'WORKING' : 'IDLE') : `${fmtT(clock)} / ${fmtT(events.length ? events[events.length - 1].t : 0)}`;
   $('feed').innerHTML = feed.map((l) => `<li>${escapeHtml(l)}</li>`).join('');
   $('stages').innerHTML = STAGES.map((s, i) => `<span class="${i < run.stage ? 'past' : i === run.stage ? 'now' : ''}">${s}</span>`).join('');
 }
@@ -200,6 +216,12 @@ function escapeHtml(s) { return s.replace(/[&<>]/g, (c) => ({ '&': '&amp;', '<':
 function drawScreen() {
   const { canvas: c, tex } = W.screen; const g = c.getContext('2d');
   g.fillStyle = '#1e1a2e'; g.fillRect(0, 0, c.width, c.height);
+  if (run.id === '-') {
+    g.fillStyle = '#ff8a5b'; g.font = '800 54px system-ui'; g.fillText('No order yet', 40, 80);
+    g.fillStyle = '#fff7ec'; g.font = '500 34px system-ui'; g.fillText('The team is idle until a run is started.', 40, 140);
+    g.fillStyle = '#a99fbf'; g.font = '500 26px system-ui'; g.fillText('Office animation: 0 tokens', 40, 450);
+    tex.needsUpdate = true; return;
+  }
   g.fillStyle = '#ff8a5b'; g.font = '800 54px system-ui'; g.fillText('RUN ' + run.id, 40, 80);
   g.fillStyle = '#fff7ec'; g.font = '500 34px system-ui'; g.fillText('Template: ' + run.template, 40, 130);
   STAGES.forEach((s, i) => {
@@ -250,8 +272,10 @@ document.querySelectorAll('[data-speed]').forEach((b) => (b.onclick = () => { sp
 document.querySelector(`[data-speed="${speed}"]`)?.classList.add('on');
 $('restart').onclick = restart;
 $('tplBtn').onclick = openTemplates;
-$('mode').textContent = LIVE ? `LIVE · ${LOG}` : `REPLAY · ${LOG.split('/').pop()}`;
-if (LIVE) { document.querySelectorAll('.replay-only').forEach((el) => (el.style.display = 'none')); $('controlsTitle').textContent = 'Live run'; }
+$('mode').textContent = LIVE ? `Watching ${LOG}` : `DEMO REPLAY · ${LOG.split('/').pop()}`;
+$('replayLink').href = LIVE ? '?replay' : './';
+$('replayLink').textContent = LIVE ? '▶ Replay sample run (demo)' : '■ Back to the office';
+if (LIVE) { document.querySelectorAll('.replay-only').forEach((el) => (el.style.display = 'none')); $('controlsTitle').textContent = 'Office status'; }
 
 // ---------- loop ----------
 function resize() { const w = canvas.clientWidth, h = canvas.clientHeight; renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix(); }

@@ -7,22 +7,24 @@ A cute 3D office where six AI staff make reels for @openanstruk and Aina. The of
 ## Where it goes
 Put this folder in `video-in-motion/office/` (shared tools live at the root there). The logo comes from OpenAnstruk-Studio `marketing/logo/`; the office never publishes anything from `marketing/`.
 
-## Watch the sample run (replay)
+## Open the office
 ```
 cd office
 npx serve .            # or: python -m http.server 8765
 ```
-Open `http://localhost:3000/` (or `:8765`). It replays `data/sample-run.jsonl`: reel 0026 "Gempa kecil tapi merusak" for the 20 Nov slot, $1.78 of $4.
+Open `http://localhost:3000/` (or `:8765`). The staff are idle (lounging, playing) and the budget stays at $0 until an order comes in. The office watches `data/events.jsonl` every 2 s; it only works when the orchestrator below writes a `run_start` there. Finished runs in that file are not replayed.
 
 - Drag to turn, scroll to zoom, hover a person to see their thought, model and spend.
 - Click the **Template Board** on the back wall (or the 🎬 button) to pick a template.
-- Speed 1×, 4×, 16×; ↺ restarts.
 
-## Run the pipeline and watch it live
+## Demo replay (optional)
+Open `index.html?replay` (or click "Replay sample run (demo)" in the side deck). It replays `data/sample-run.jsonl`: reel 0026 "Gempa kecil tapi merusak", $1.78 of $4. Simulated, nothing is spent. Speed 1×, 4×, 16×; ↺ restarts.
+
+## Give an order (run the pipeline)
 ```
 node orchestrator/run.mjs --topic "Gempa kecil tapi merusak" --slot 2026-11-20 --template kolase-browser --pace 3
 ```
-Open `index.html?live=1` at the same time. Engines:
+Keep the office open at the same time. Engines:
 
 | `--engine` | What happens | Cost |
 |---|---|---|
