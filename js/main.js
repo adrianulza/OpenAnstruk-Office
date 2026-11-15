@@ -74,7 +74,7 @@ function apply(ev) {
   const a = agents[ev.agent];
   if (!a) return;
   const line = `${fmtT(ev.t)}  ${a.info.name}: ${ev.type}${ev.summary ? ' · ' + ev.summary : ''}${ev.usd ? ` (+$${ev.usd.toFixed(2)})` : ''}`;
-  feed.unshift(line); feed.length = Math.min(feed.length, 8);
+  feed.unshift(line); feed.length = Math.min(feed.length, 60);
   if (stageOf[ev.agent] !== undefined && ['task_start', 'tool', 'thinking'].includes(ev.type)) run.stage = Math.max(run.stage, stageOf[ev.agent]);
   say(a, ev);
 
@@ -218,7 +218,8 @@ function drawScreen() {
 // ---------- hover bubbles + clicks ----------
 const ray = new THREE.Raycaster(), mouse = new THREE.Vector2(); let hoverAgent = null, hoverObj = null;
 canvas.addEventListener('pointermove', (e) => {
-  mouse.set((e.clientX / innerWidth) * 2 - 1, -(e.clientY / innerHeight) * 2 + 1);
+  const r = canvas.getBoundingClientRect();
+  mouse.set(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1);
   ray.setFromCamera(mouse, camera);
   const targets = [...Object.values(agents).filter((a) => a.root.visible).map((a) => a.root), ...W.clickables];
   const hit = ray.intersectObjects(targets, true)[0];
@@ -250,11 +251,11 @@ document.querySelector(`[data-speed="${speed}"]`)?.classList.add('on');
 $('restart').onclick = restart;
 $('tplBtn').onclick = openTemplates;
 $('mode').textContent = LIVE ? `LIVE · ${LOG}` : `REPLAY · ${LOG.split('/').pop()}`;
-if (LIVE) document.querySelectorAll('.replay-only').forEach((el) => (el.style.display = 'none'));
+if (LIVE) { document.querySelectorAll('.replay-only').forEach((el) => (el.style.display = 'none')); $('controlsTitle').textContent = 'Live run'; }
 
 // ---------- loop ----------
-function resize() { renderer.setSize(innerWidth, innerHeight, false); camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix(); }
-addEventListener('resize', resize); resize();
+function resize() { const w = canvas.clientWidth, h = canvas.clientHeight; renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix(); }
+new ResizeObserver(resize).observe(canvas); resize();
 const clk = new THREE.Clock(); let t = 0, hudT = 0;
 function frame() {
   const dt = Math.min(0.05, clk.getDelta()); t += dt;
