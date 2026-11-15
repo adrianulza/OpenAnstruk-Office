@@ -3,3 +3,6 @@ node_modules/
 .env.*
 .claude/settings.local.json
 .vscode/settings.json
+# run output: logs, state, artifacts, chats and the cost ledger stay on your PC
+runs/
+data/events.jsonl

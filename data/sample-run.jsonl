@@ -52,4 +52,4 @@
 {"t": 256, "run": "0026-gempa-kecil-merusak", "agent": "scriptwriter", "type": "cost", "usd": 0.03, "usage": {"in": 2000, "out": 1500, "cache_read": 23000, "cache_write": 2000}}
 {"t": 257, "run": "0026-gempa-kecil-merusak", "agent": "scriptwriter", "type": "done", "summary": "caption-ig.md 1.840 karakter, 5 hashtag"}
 {"t": 258, "run": "0026-gempa-kecil-merusak", "agent": "producer", "type": "cost", "usd": 0.05, "usage": {"in": 3000, "out": 1500, "cache_read": 27000, "cache_write": 3000}}
-{"t": 260, "run": "0026-gempa-kecil-merusak", "agent": "producer", "type": "run_end", "summary": "Reel 0026 siap tayang 20 Nov 07.30. Total $1.78"}
+{"t": 260, "run": "0026-gempa-kecil-merusak", "agent": "producer", "type": "run_end", "status": "ok", "summary": "Reel 0026 siap tayang 20 Nov 07.30. Total $1.78"}

@@ -53,52 +53,49 @@
 </header>
 <main>
   <section class="grid" id="grid"></section>
-  <aside id="panel"><h2>Pick a template</h2><p class="muted">Choose a card. The run config below is what the Producer receives. Nothing runs from this page and it costs zero tokens.</p></aside>
+  <aside id="panel"><h2>Pick a template</h2><p class="muted">Choose a card. Send it to the Producer desk (office on your PC) or copy the run config for the command line. Nothing runs from this page and it costs zero tokens.</p></aside>
 </main>
 <script>
 const CAP = 4;
 let DATA = [], picked = null;
+const esc = (v) => String(v ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const safeUrl = (u) => /^https?:\/\//i.test(u || '') ? u : '';
+const $ = (id) => document.getElementById(id);
 
-// Works from file:// too: falls back to an embedded copy if fetch is blocked.
 fetch('templates.json').then(r => r.json()).then(init).catch(() => {
-  document.getElementById('grid').innerHTML = '<p>Open this page through a local server (e.g. <code>npx serve office</code>) so it can read templates.json.</p>';
+  $('grid').innerHTML = '<p>Open this page through the office server (<code>npm start</code>) or any local server so it can read templates.json.</p>';
 });
 
 function init(d){
   DATA = d.templates;
   const cats = [...new Set(DATA.map(t => t.category))];
-  const sel = document.getElementById('cat');
-  cats.forEach(c => sel.insertAdjacentHTML('beforeend', `<option>${c}</option>`));
-  ['q','cat','kreator','rec','ready'].forEach(id => document.getElementById(id).addEventListener('input', render));
+  cats.forEach(c => $('cat').insertAdjacentHTML('beforeend', `<option>${esc(c)}</option>`));
+  ['q','cat','kreator','rec','ready'].forEach(id => $(id).addEventListener('input', render));
   render();
 }
 
-function isReady(t){ return t.status === 'ready'; }
+const isReady = (t) => t.status === 'ready';
 
 function render(){
-  const q = document.getElementById('q').value.toLowerCase();
-  const cat = document.getElementById('cat').value;
-  const rec = document.getElementById('rec').checked;
-  const ready = document.getElementById('ready').checked;
-  const k = document.getElementById('kreator').value;
+  const q = $('q').value.toLowerCase(), cat = $('cat').value, rec = $('rec').checked, ready = $('ready').checked, k = $('kreator').value;
   const list = DATA.filter(t =>
     (!cat || t.category === cat) &&
     (!rec || t.recommended || !t.id.startsWith('opuscar:')) &&
     (!ready || isReady(t)) &&
     (!t.kreator || t.kreator.includes(k)) &&
     (!q || JSON.stringify(t).toLowerCase().includes(q)));
-  document.getElementById('count').textContent = `${list.length} templates · cap $${CAP}/video`;
-  document.getElementById('grid').innerHTML = list.map(t => `
-    <div class="card ${picked && picked.id === t.id ? 'sel' : ''}" data-id="${t.id}">
-      <div class="thumb" style="${t.poster ? `background-image:url('${t.poster}')` : ''}">${t.poster ? '' : '🏗️'}</div>
+  $('count').textContent = `${list.length} templates · cap $${CAP}/video`;
+  $('grid').innerHTML = list.map(t => `
+    <div class="card ${picked && picked.id === t.id ? 'sel' : ''}" data-id="${esc(t.id)}">
+      <div class="thumb" style="${safeUrl(t.poster) ? `background-image:url('${esc(safeUrl(t.poster))}')` : ''}">${safeUrl(t.poster) ? '' : '🏗️'}</div>
       <div class="body">
-        <div class="name">${t.name}</div>
-        <div class="cat">${t.category}</div>
+        <div class="name">${esc(t.name)}</div>
+        <div class="cat">${esc(t.category)}</div>
         <div class="tags">
           ${t.recommended ? '<span class="tag rec">★ fits our topics</span>' : ''}
-          ${isReady(t) ? '<span class="tag ok">ready</span>' : `<span class="tag warn">${t.id.startsWith('opuscar:') ? 'adapt first' : t.status}</span>`}
+          ${isReady(t) ? '<span class="tag ok">ready</span>' : `<span class="tag warn">${t.id.startsWith('opuscar:') ? 'adapt first' : esc(t.status)}</span>`}
           ${t.needsImageGen ? '<span class="tag warn">needs image generator</span>' : ''}
-          <span class="tag">~$${t.estUSD.toFixed(2)}</span>
+          <span class="tag">~$${Number(t.estUSD).toFixed(2)}</span>
         </div>
       </div>
     </div>`).join('');
@@ -108,35 +105,44 @@ function render(){
 function pick(id){
   picked = DATA.find(t => t.id === id);
   render();
-  const t = picked, k = document.getElementById('kreator').value;
+  const t = picked, k = $('kreator').value, ready = isReady(t);
   const pct = Math.min(100, t.estUSD / CAP * 100);
   const color = pct < 60 ? 'var(--ok)' : pct < 90 ? 'var(--warn)' : '#d9534f';
-  const run = {
-    kreator: k,
-    template: t.id,
-    topic: '',
-    slot: '',
-    voice: t.voice || (k === 'aina' ? 'aina' : 'ulza'),
-    aspect: '9:16',
-    platforms: ['instagram', 'tiktok'],
-    phase: isReady(t) ? 2 : 1,
-    budgetUSD: CAP
-  };
-  document.getElementById('panel').innerHTML = `
-    <h2>${t.name}</h2>
-    <div class="muted">${t.line || t.basis || ''}</div>
-    ${t.gallery ? `<p><a href="${t.gallery}" target="_blank" rel="noopener">▶ Watch the demo film</a> (${Math.round(t.demoSec)} s)</p>` : ''}
-    <div class="row"><span>Estimated per video</span><b>$${t.estUSD.toFixed(2)}</b></div>
+  // Same shape that `node orchestrator/run.mjs --config run.json` and the Producer desk accept.
+  const run = ready
+    ? { kreator: k, template: t.id, topic: '', slot: '', notes: '', approve: ['script', 'final'], platforms: ['instagram', 'tiktok'], budgetUSD: CAP }
+    : { kreator: k, template: t.id, phase: 1 };
+  const gallery = safeUrl(t.gallery);
+  $('panel').innerHTML = `
+    <h2>${esc(t.name)}</h2>
+    <div class="muted">${esc(t.line || t.basis || '')}</div>
+    ${gallery ? `<p><a href="${esc(gallery)}" target="_blank" rel="noopener">▶ Watch the demo film</a> (${Math.round(t.demoSec || 0)} s)</p>` : ''}
+    <div class="row"><span>Estimated per video</span><b>$${Number(t.estUSD).toFixed(2)}</b></div>
     <div class="meter"><i style="width:${pct}%;background:${color}"></i></div>
-    ${t.id.startsWith('opuscar:') ? '<p class="muted">First use: adapt the style to 9:16, Bahasa Indonesia and our brand (one-off, over the $4 cap, needs your OK). After that it runs like a house template.</p>' : ''}
-    <div class="row"><label>Topic <input id="topic" placeholder="e.g. Megathrust Aceh"></label></div>
+    ${ready ? '' : '<p class="muted">Not ready yet: first a one-off adaptation run (phase 1) makes it our own (9:16, Bahasa Indonesia, brand). It pauses twice for your OK, then the template counts as ready.</p>'}
+    ${ready ? `<div class="row"><label>Topic <input id="topic" placeholder="e.g. Megathrust Aceh"></label></div>
     <div class="row"><label>Slot <input id="slot" type="date"></label></div>
+    <div class="row"><label>Notes <input id="notes" placeholder="angle, hook, sources"></label></div>` : ''}
     <pre id="cfg"></pre>
-    <button id="copy">Copy run config</button>`;
-  const cfg = document.getElementById('cfg');
-  const upd = () => { run.topic = topic.value; run.slot = slot.value; cfg.textContent = JSON.stringify(run, null, 2); };
-  topic.oninput = slot.oninput = upd; upd();
-  document.getElementById('copy').onclick = () => navigator.clipboard.writeText(cfg.textContent);
+    <div class="row" style="flex-wrap:wrap">
+      ${ready ? '<button id="send">💬 Send to Producer desk</button>' : ''}
+      <button id="copy" style="background:#2b2340">Copy run config</button>
+    </div>
+    <p class="muted" id="hint"></p>`;
+  const cfg = $('cfg');
+  const upd = () => {
+    if (ready) { run.topic = $('topic').value.trim(); run.slot = $('slot').value; run.notes = $('notes').value.trim(); }
+    cfg.textContent = JSON.stringify(run, null, 2);
+    $('hint').innerHTML = `Save it as <code>run.json</code>, then: <code>node orchestrator/run.mjs --config run.json --engine claude-cli --repo &lt;your repo&gt;</code>`;
+  };
+  if (ready) ['topic', 'slot', 'notes'].forEach((id) => ($(id).oninput = upd));
+  upd();
+  $('copy').onclick = () => navigator.clipboard.writeText(cfg.textContent).then(() => ($('copy').textContent = 'Copied ✓'));
+  if (ready) $('send').onclick = () => {
+    localStorage.setItem('office.draft', JSON.stringify(run));
+    if (window.opener && !window.opener.closed) { window.opener.focus(); $('send').textContent = 'Sent ✓ (see the office tab)'; }
+    else location.href = 'index.html';
+  };
 }
 </script>
 </body>

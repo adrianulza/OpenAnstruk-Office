@@ -39,7 +39,30 @@
   #tip{position:fixed;display:none;max-width:280px;background:#fff;border:2px solid var(--line);border-radius:16px;padding:10px 12px;font-size:13px;pointer-events:none;box-shadow:0 6px 0 rgba(240,220,196,.9);z-index:9}
   #tip .thought{margin:6px 0;font-size:14px}
   .muted{color:var(--muted);font-size:12px}
-  @media(max-width:800px){#legend{display:none}#feedBox{width:calc(100vw - 28px)}}
+  #feedBox.open #feed{max-height:42vh;overflow:auto}
+  #feedBox h2{display:flex;justify-content:space-between;align-items:center}
+  #feedBox h2 button{font-size:11px;padding:2px 8px}
+  #seekRow{display:flex;gap:8px;align-items:center;margin-top:6px}
+  #seek{flex:1;accent-color:var(--accent)}
+  #runPick{font:inherit;font-size:12px;border:2px solid var(--line);border-radius:10px;padding:4px;max-width:180px}
+  #banner{top:84px;left:50%;transform:translateX(-50%);max-width:min(560px,46vw);font-size:13px;font-weight:700;display:none;z-index:5}
+  #banner.blocked{background:#ffe3e0;border-color:#f3b0a8;color:#8a2a1f}
+  #banner.wait,#banner.approval{background:#fff2cc;border-color:#f1d27a;color:#6b5108}
+  #banner.ok{background:#dff5e3;border-color:#a9dfb4;color:#205c34}
+  #agentPanel{top:330px;left:14px;width:300px;max-height:calc(100vh - 560px);min-height:120px;overflow:auto;display:none;font-size:12px}
+  #agentPanel h2{margin:0;font-size:16px}#agentPanel h3{margin:8px 0 4px;font-size:12px}
+  #agentPanel ul{list-style:none;margin:0;padding:0}#agentPanel li{padding:2px 0;border-bottom:1px dashed var(--line)}
+  #agentPanel .x,.x{position:absolute;right:10px;top:8px;padding:2px 8px;font-size:12px}
+  #staticNote{display:none;margin-top:6px;background:#fff2cc;border-radius:10px;padding:6px 8px}
+  #staticNote code{font-size:11px}
+  @media(max-width:800px){
+    #legend{display:none}#feedBox{width:calc(100vw - 28px);box-sizing:border-box}#feed{max-height:96px}
+    #controls{top:8px;left:8px;right:8px;flex-wrap:wrap;justify-content:center;padding:6px 8px}
+    #controls button{padding:5px 8px}#mode{display:none}#clock{min-width:0}
+    #runCard{top:auto;bottom:178px;left:8px;width:calc(100vw - 16px);box-sizing:border-box;padding:8px 10px}
+    #runCard h1{display:none}#stages{display:none}
+    #banner{max-width:90vw;top:110px}#agentPanel{display:none!important}
+  }
 </style>
 </head>
 <body>
@@ -50,8 +73,8 @@
   <div class="kv"><span>Run</span><b id="runId">-</b></div>
   <div class="kv"><span>Template</span><b id="runTpl">-</b></div>
   <div class="kv"><span>Status</span><b id="runStatus">idle</b></div>
-  <div id="meter"><div id="meterFill"></div><i class="tick" style="left:75%"></i><i class="tick" style="left:90%"></i></div>
-  <div class="kv"><span id="usd">$0.00 / $4.00</span><span class="muted">guard 3.00 · 3.60</span></div>
+  <div id="meter"><div id="meterFill"></div><i class="tick" id="tickWrap" style="left:75%"></i><i class="tick" id="tickStop" style="left:90%"></i></div>
+  <div class="kv"><span id="usd">$0.00 / $4.00</span><span class="muted" id="guardTxt">guard 3.00 · 3.60</span></div>
   <div id="budgetMsg"></div>
   <div id="stages"></div>
 </div>
@@ -63,16 +86,23 @@
   <button data-speed="16" class="replay-only">16×</button>
   <button id="restart" class="replay-only" title="Replay from the start">↺</button>
   <span id="clock"></span>
+  <select id="runPick" class="replay-only" style="display:none" title="Run in this log"></select>
   <button id="tplBtn" class="primary">🎬 Templates</button>
   <div id="mode"></div>
 </div>
 
-<div class="panel" id="feedBox"><h2>Activity</h2><ul id="feed"></ul></div>
+<div class="panel" id="banner"></div>
+<div class="panel" id="agentPanel"></div>
+
+<div class="panel" id="feedBox"><h2>Activity <button id="feedToggle" title="Show the whole run">all</button></h2><ul id="feed"></ul>
+  <div id="seekRow" class="replay-only"><input type="range" id="seek" min="0" max="0" step="1" value="0" title="Seek"></div>
+</div>
 
 <div class="panel" id="legend">
   <span class="zero">0 tokens</span>
   <h2>How to read the office</h2>
-  Hover a person to see what they are thinking. Drag to turn, scroll to zoom. Click the Template Board on the back wall to choose a style.
+  Hover a person to see what they are thinking, click for their history. Drag to turn, scroll or pinch to zoom. Click the Template Board on the back wall to choose a style.
+  <div id="staticNote">This online copy only <b>replays</b> a sample run. To talk to Pak Prod and make reels, run it on your PC: <code>npm start</code> (see README).</div>
   <div class="muted" style="margin-top:6px">⌨️ working · 💭 thinking · 📄 handoff · ❗ blocked · ⏳ waiting for you · 🎉 done · ☕🎮 break</div>
 </div>
 

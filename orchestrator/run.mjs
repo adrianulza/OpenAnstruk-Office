@@ -1,233 +1,510 @@
 #!/usr/bin/env node
-// run.mjs: the Producer's pipeline for one video, with the $4 budget guard.
-// Every step writes events to the office log, so the 3D office can replay or follow it live.
+// run.mjs: the Producer's pipeline for one reel (or one template adaptation), with the budget guard.
+// Every step writes events to data/events.jsonl and runs/<id>/events.jsonl, so the office can follow it.
 //
-//   node orchestrator/run.mjs --template kolase-browser --topic "Gempa kecil tapi merusak" --slot 2026-11-20
-//   options:
-//     --engine dry | claude-cli | api   (default dry: no model calls, simulated usage, free)
-//     --kreator openanstruk | aina       (default openanstruk)
-//     --repo <path>                      repo the agents work in (claude-cli engine), e.g. D:\_Projects\OpenAnstruk-Studio
-//     --log <file>                       default office/data/events.jsonl
-//     --cap 4 --wrap 3.0 --stop 3.6      budget guard in USD
-//     --skip-voice                       do not wait for the human voice-over
-//     --pace 4                           dry engine: slow the simulation down for a live office demo
-//     --run <id>                         run id, default from slot + topic
+//   node orchestrator/run.mjs --topic "Gempa kecil tapi merusak" --slot 2026-11-20 --template kolase-browser
+//   node orchestrator/run.mjs --config run.json            (the Template Board's "Copy run config")
+//   node orchestrator/run.mjs --resume 0026-gempa-kecil-merusak
 //
-// Engines
-//   dry        Simulates each step with the token sizes from cost-model.py. Use it to test the office.
-//   claude-cli Runs each seat as `claude -p` (Claude Code headless) inside --repo, with the seat's
-//              agent file as system prompt and the seat's model. Works on a subscription or an API key.
-//              Usage and cost come from `--output-format json`.
-//   api        Text-only steps through the Messages API (needs ANTHROPIC_API_KEY). Cannot edit files,
-//              so it only covers research notes, script drafts, critique and captions.
+// Run with --help for every option. Steps, models and prices: data/pipeline.json.
 import fs from 'node:fs';
 import path from 'node:path';
-import { spawnSync } from 'node:child_process';
-import { fileURLToPath } from 'node:url';
+import {
+  OFFICE, PIPELINE, TEMPLATES, ConfigError, parseArgs, buildConfig, resolveRunId, resolvePostDir, pipelineFor, validate,
+} from './lib/config.mjs';
+import { createEmitter, loadState, saveState, appendLedger, notify, runDir, END_STATUSES } from './lib/events.mjs';
+import {
+  ENGINE_FNS, estimate, turnsAllowed, parseGate, summaryOf, missingOutputs, captureOutputs, fill,
+  runCommand, findCommand, expand,
+} from './lib/engines.mjs';
+import { killTree, claudeInstalled } from './lib/claude.mjs';
 
-const HERE = path.dirname(fileURLToPath(import.meta.url));
-const OFFICE = path.resolve(HERE, '..');
+const HELP = `Usage: node orchestrator/run.mjs [options]
 
-// ---------- args ----------
-const argv = process.argv.slice(2);
-const opt = (k, d) => { const i = argv.indexOf('--' + k); return i >= 0 ? (argv[i + 1] && !argv[i + 1].startsWith('--') ? argv[i + 1] : true) : d; };
-const ENGINE = opt('engine', 'dry');
-const KREATOR = opt('kreator', 'openanstruk');
-const TEMPLATE = opt('template', 'kolase-browser');
-const TOPIC = opt('topic', 'Topik belum diisi');
-const SLOT = opt('slot', new Date().toISOString().slice(0, 10));
-const REPO = opt('repo', process.cwd());
-const LOG = path.resolve(opt('log', path.join(OFFICE, 'data', 'events.jsonl')));
-const CAP = +opt('cap', 4), WRAP = +opt('wrap', 3.0), STOP = +opt('stop', 3.6);
-const SKIP_VOICE = !!opt('skip-voice', false);
-const PACE = +opt('pace', 1);           // dry engine only: slow down for a live office demo (e.g. --pace 4)
-const RUN = opt('run', `${SLOT}-${TOPIC.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 32)}`);
+What to make
+  --topic <text>          Reel topic (required for phase 2)
+  --slot <YYYY-MM-DD>     Publish slot (default today)
+  --template <id>         Template id from templates.json (default kolase-browser)
+  --kreator <name>        openanstruk | aina (default openanstruk)
+  --notes <text>          Extra instructions for the team
+  --config <file>         JSON run config (Template Board / office "Start run"); flags override it
+  --phase <1|2>           2 = make a reel (default), 1 = adapt a template that is not ready yet
 
-// ---------- prices (USD per million tokens, Nov 2026 list) ----------
-// Assumption: model ids below; override with ORCH_MODEL_OPUS / _SONNET / _HAIKU if your account uses others.
-const MODELS = {
-  opus:   { id: process.env.ORCH_MODEL_OPUS   || 'claude-opus-5-5',   in: 4.00, out: 20.00, read: 0.20 },
-  sonnet: { id: process.env.ORCH_MODEL_SONNET || 'claude-sonnet-5-5', in: 2.00, out: 10.00, read: 0.10 },
-  haiku:  { id: process.env.ORCH_MODEL_HAIKU  || 'claude-haiku-5-5',  in: 0.10, out: 0.50,  read: 0.01 },
-};
-const priceOf = (m, u) => (u.in * MODELS[m].in + u.out * MODELS[m].out + u.cache_read * MODELS[m].read + u.cache_write * MODELS[m].in * 1.25) / 1e6;
+How to run it
+  --engine <name>         dry (free, simulated) | claude-cli (Claude Code: subscription or API key) | api (API key, text-only)
+  --repo <path>           Repo the agents work in (claude-cli/api), e.g. D:\\_Projects\\OpenAnstruk-Studio
+  --subscription          Remove ANTHROPIC_API_KEY from the agents' environment so Claude Code uses your subscription login
+  --run <id>              Run id (default: next number + slug, e.g. 0026-gempa-kecil-merusak)
+  --post <dir>            Post folder (default <repo>/marketing/posts/<run> or aina/projects/<run>)
+  --until <step>          Stop after this step (e.g. attention: brief, research and script only)
+  --resume <run id>       Continue a parked, blocked or failed run from where it stopped
 
-// ---------- the pipeline (Phase 2, office-plan-v2.md) ----------
-// size: simulated usage for the dry engine (turns x tokens), from cost-model.py
-const STEPS = [
-  { seat: 'producer',     model: 'haiku',  effort: 'low',    task: 'brief',    say: `Brief: ${TOPIC} (${SLOT}), template ${TEMPLATE}`, size: [6, 15000, 2000, 800] },
-  { seat: 'researcher',   model: 'sonnet', effort: 'medium', task: 'research', say: 'Cek fakta: setiap angka bersumber dan bertanggal', size: [8, 30000, 3000, 1200], handoff: 'scriptwriter' },
-  { seat: 'scriptwriter', model: 'opus',   effort: 'high',   task: 'script',   say: 'Naskah lisan + script.json, hook tanpa angka', size: [5, 35000, 2000, 3000], handoff: 'critic', check: 'cek-naskah' },
-  { seat: 'critic',       model: 'opus',   effort: 'medium', task: 'critique', say: 'naskah-critic, satu putaran', size: [4, 35000, 3000, 1500], batch: true, gate: true },
-  { seat: 'critic',       model: 'sonnet', effort: 'low',    task: 'attention', say: 'attention-check mode 1', size: [4, 30000, 2000, 1200], batch: true, handoff: 'animator' },
-  { seat: 'animator',     model: 'sonnet', effort: 'high',   task: 'animate',  say: `Isi templat ${TEMPLATE}: adegan, isyarat kata`, size: [25, 60000, 3000, 2500], wrapAware: true },
-  { seat: 'human',        task: 'voice' },
-  { seat: 'ops',          task: 'render' },
-  { seat: 'scriptwriter', model: 'sonnet', effort: 'medium', task: 'captions', say: 'Caption IG, judul TikTok dan YouTube', size: [3, 25000, 2000, 1500], batch: true },
-];
+Human checkpoints
+  --approve <list>        Pause for your OK at: brief,script,final (comma list)
+  --auto-approve          Approve every checkpoint automatically (demos)
+  --wait <minutes>        How long to wait for a recording or an approval before parking the run (default 60)
+  --skip-voice            Do not wait for the voice-over / footage
 
-// ---------- event log ----------
-fs.mkdirSync(path.dirname(LOG), { recursive: true });
-const T0 = Date.now();
-let spent = 0, wrapped = false;
-function emit(agent, type, extra = {}) {
-  const ev = { t: +((Date.now() - T0) / 1000).toFixed(1), run: RUN, agent, type, ...extra };
-  fs.appendFileSync(LOG, JSON.stringify(ev) + '\n');
-  const usd = ev.usd ? `  +$${ev.usd.toFixed(3)} (total $${spent.toFixed(2)})` : '';
-  console.log(`[${String(ev.t).padStart(6)}] ${agent.padEnd(12)} ${type.padEnd(13)} ${ev.summary || ''}${usd}`);
-}
+Budget and safety
+  --cap 4 --wrap 3 --stop 3.6   Guard in USD (phase 1 default 6 / 4.5 / 5.4)
+  --rounds <n>            Revision rounds after a BLOCK before the run stops (default 1)
+  --retries <n>           Retries for a failed step (default 1)
+  --step-timeout <min>    Kill a step after this many minutes (default 30)
+  --pace <n>              dry engine: slow the simulation down for a live demo
+  --dry-verdicts <spec>   dry engine: simulate verdicts, e.g. critique=BLOCK,PASS;qa=PASS`;
+
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
-
-// ---------- engines ----------
-function agentPrompt(seat) {
-  const f = path.join(OFFICE, 'agents', `office-${seat}.md`);
-  return fs.existsSync(f) ? fs.readFileSync(f, 'utf8').replace(/^---[\s\S]*?---\n/, '') : '';
-}
-function taskPrompt(step) {
-  return [
-    `Run ${RUN}. Kreator: ${KREATOR}. Template: ${TEMPLATE}. Topic: ${TOPIC}. Slot: ${SLOT}.`,
-    `Your task: ${step.task}. ${step.say}.`,
-    wrapped ? 'BUDGET WRAP-UP: finish what you are doing in as few turns as possible. No new scenes.' : '',
-    'End with one line starting with SUMMARY: (at most 90 characters, Bahasa Indonesia).',
-    step.gate ? 'Also print one line VERDICT: PASS or VERDICT: BLOCK <reason>.' : '',
-  ].filter(Boolean).join('\n');
-}
-
-// Estimated cost of a step from its size, and how many turns still fit under the stop line.
-function estimate(step, turns = step.size[0]) {
-  const [, ctx, fresh, out] = step.size;
-  const u = { in: 0, out: turns * out, cache_read: turns * (ctx - fresh), cache_write: turns * fresh };
-  return priceOf(step.model, u) * (step.batch ? 0.5 : 1);
-}
-function turnsAllowed(step) {
-  const left = STOP - spent, full = step.size[0];
-  if (estimate(step) <= left) return full;
-  const perTurn = estimate(step, 1);
-  return Math.max(1, Math.floor(left / perTurn));
-}
-
-async function callDry(step) {
-  const [, ctx, fresh, out] = step.size;
-  const turns = step.turns;
-  await sleep((600 + turns * 120) * PACE);
-  // with caching the fresh part of each turn is billed as a cache write, the rest as cache reads
-  const u = { in: 0, out: turns * out, cache_read: turns * (ctx - fresh), cache_write: turns * fresh };
-  return { usage: u, usd: priceOf(step.model, u) * (step.batch ? 0.5 : 1), text: `SUMMARY: ${step.say}\nVERDICT: PASS` };
-}
-
-async function callClaudeCli(step) {
-  const args = ['-p', taskPrompt(step), '--output-format', 'json', '--model', MODELS[step.model].id,
-    '--append-system-prompt', agentPrompt(step.seat), '--max-turns', String(step.turns * 2), '--permission-mode', 'acceptEdits'];
-  const r = spawnSync('claude', args, { cwd: REPO, encoding: 'utf8', maxBuffer: 64 * 1024 * 1024, shell: process.platform === 'win32' });
-  if (r.status !== 0) throw new Error(`claude -p failed: ${r.stderr || r.error}`);
-  const j = JSON.parse(r.stdout);
-  const u = j.usage || {};
-  const usage = { in: u.input_tokens || 0, out: u.output_tokens || 0, cache_read: u.cache_read_input_tokens || 0, cache_write: u.cache_creation_input_tokens || 0 };
-  // on a subscription total_cost_usd is the API-equivalent figure; it is still what the guard counts
-  return { usage, usd: j.total_cost_usd ?? priceOf(step.model, usage), text: j.result || '' };
-}
-
-async function callApi(step) {
-  const key = process.env.ANTHROPIC_API_KEY;
-  if (!key) throw new Error('ANTHROPIC_API_KEY is not set');
-  const res = await fetch('https://api.anthropic.com/v1/messages', {
-    method: 'POST',
-    headers: { 'content-type': 'application/json', 'x-api-key': key, 'anthropic-version': '2023-06-01' },
-    body: JSON.stringify({
-      model: MODELS[step.model].id, max_tokens: Math.max(800, Math.min(6000, Math.round(step.turns * step.size[3]))),
-      system: [{ type: 'text', text: agentPrompt(step.seat), cache_control: { type: 'ephemeral' } }],
-      messages: [{ role: 'user', content: taskPrompt(step) }],
-    }),
-  });
-  const j = await res.json();
-  if (!res.ok) throw new Error(JSON.stringify(j));
-  const u = j.usage;
-  const usage = { in: u.input_tokens, out: u.output_tokens, cache_read: u.cache_read_input_tokens || 0, cache_write: u.cache_creation_input_tokens || 0 };
-  return { usage, usd: priceOf(step.model, usage), text: j.content.map((c) => c.text || '').join('\n') };
-}
-const ENGINES = { dry: callDry, 'claude-cli': callClaudeCli, api: callApi };
-
-// ---------- free deterministic checks (scripts before agents) ----------
-function freeCheck(name) {
-  if (ENGINE === 'dry') return { ok: true, note: `${name}: dilewati (dry)` };
-  if (name === 'cek-naskah') {
-    const tool = path.join(REPO, 'tools', 'naskah', 'cek-naskah.mjs');
-    if (!fs.existsSync(tool)) return { ok: true, note: 'cek-naskah.mjs tidak ada di repo ini' };
-    return { ok: true, note: 'cek-naskah.mjs dijalankan oleh agen penulis' };
-  }
-  return { ok: true, note: name };
-}
-
-// ---------- run ----------
-async function step(s) {
-  if (spent >= STOP) { emit(s.seat, 'budget', { summary: `Stop: $${spent.toFixed(2)} >= $${STOP}. Langkah ${s.task} pakai skrip saja`, level: 'stop' }); return { skipped: true }; }
-  if (!wrapped && spent >= WRAP) { wrapped = true; emit('producer', 'budget', { summary: `Wrap-up: $${spent.toFixed(2)} dari $${CAP}. Selesaikan, jangan tambah adegan`, level: 'wrap_up' }); }
-  s.turns = turnsAllowed(s);
-  if (s.turns < s.size[0]) {
-    if (!wrapped) wrapped = true;
-    emit('producer', 'budget', { summary: `${s.task}: dibatasi ${s.turns}/${s.size[0]} giliran agar di bawah $${STOP}`, level: 'wrap_up' });
-  }
-  emit(s.seat, 'task_start', { summary: s.say, model: s.model, effort: s.effort });
-  emit(s.seat, 'thinking', { summary: s.task === 'animate' && wrapped ? 'Mode hemat: selesaikan adegan yang ada' : s.say });
-  const out = await ENGINES[ENGINE](s);
-  spent += out.usd;
-  emit(s.seat, 'cost', { usd: +out.usd.toFixed(4), usage: out.usage, model: s.model });
-  const summary = (out.text.match(/SUMMARY:\s*(.+)/) || [])[1]?.slice(0, 90) || `${s.task} selesai`;
-  if (s.check) { const c = freeCheck(s.check); emit(s.seat, 'tool', { summary: c.note }); }
-  const verdict = (out.text.match(/VERDICT:\s*(PASS|BLOCK.*)/) || [])[1] || 'PASS';
-  return { summary, verdict };
-}
+const EXIT = { ok: 0, partial: 0, blocked: 3, rejected: 3, over_budget: 3, error: 1, cancelled: 130 };
 
 async function main() {
-  emit('producer', 'run_start', { template: TEMPLATE, summary: `${SLOT}: ${TOPIC}`, model: 'haiku', effort: 'low' });
-  let rounds = 0;
-  for (let i = 0; i < STEPS.length; i++) {
-    const s = STEPS[i];
-    if (s.seat === 'human') {
-      if (SKIP_VOICE) { emit('producer', 'tool', { summary: 'Rekaman suara dilewati (--skip-voice)' }); continue; }
-      const who = KREATOR === 'aina' ? 'aina' : 'ulza';
-      emit('producer', 'waiting_human', { to: who, summary: `${who === 'aina' ? 'Aina' : 'Ulza'}, rekam sesuai script.json lalu simpan di voice/` });
-      emit(who, 'task_start', { summary: 'Rekam di booth' });
-      if (ENGINE === 'dry') await sleep(3000 * PACE);
-      else await waitForVoice();
-      emit(who, 'done', { summary: 'Rekaman masuk' });
-      emit('producer', 'handoff', { to: 'ops', summary: 'Rekaman masuk, lanjut render' });
-      continue;
-    }
-    if (s.seat === 'ops') { await renderStep(); continue; }
-    const r = await step(s);
-    if (r.skipped) continue;
-    if (s.gate && r.verdict.startsWith('BLOCK') && rounds < 1) {
-      rounds++;
-      emit('critic', 'blocked', { summary: r.verdict.slice(0, 90) });
-      emit('critic', 'handoff', { to: 'scriptwriter', summary: 'Kembalikan ke penulis' });
-      i = STEPS.findIndex((x) => x.task === 'script') - 1;   // one revision round, then on
-      continue;
-    }
-    emit(s.seat, 'done', { summary: r.summary });
-    if (s.handoff) emit(s.seat, 'handoff', { to: s.handoff, summary: r.summary });
-  }
-  emit('producer', 'run_end', { summary: `Run ${RUN} selesai. Total $${spent.toFixed(2)} dari $${CAP}` });
-  console.log(`\nTotal: $${spent.toFixed(3)}  (cap $${CAP})  log: ${LOG}`);
-}
+  let flags;
+  try { flags = parseArgs(process.argv.slice(2)); } catch (e) { return usageError(e); }
+  if (flags.help) { console.log(HELP); return 0; }
 
-async function waitForVoice() {
-  const dir = path.join(REPO, 'marketing', 'posts', RUN, 'voice');
-  emit('producer', 'thinking', { summary: `Menunggu berkas suara di ${path.relative(REPO, dir)}` });
-  while (!(fs.existsSync(dir) && fs.readdirSync(dir).some((f) => /\.(wav|m4a|mp3)$/i.test(f)))) await sleep(15000);
-}
-
-async function renderStep() {
-  emit('ops', 'task_start', { summary: 'Whisper, campur, render (skrip, tanpa agen)', model: 'none', effort: 'none' });
-  const post = path.join(REPO, 'marketing', 'posts', RUN);
-  if (ENGINE !== 'dry' && fs.existsSync(path.join(post, 'final.sh'))) {
-    const r = spawnSync('bash', [path.join(post, 'final.sh')], { cwd: post, encoding: 'utf8' });
-    emit('ops', r.status === 0 ? 'tool' : 'blocked', { summary: r.status === 0 ? 'final.sh selesai' : 'final.sh gagal, cek log' });
+  let state, cfg;
+  if (flags.resume) {
+    state = loadState(flags.resume);
+    if (!state) return usageError(new ConfigError(`No run "${flags.resume}" in runs/`));
+    if (state.status === 'ok') return usageError(new ConfigError(`Run "${state.run}" already finished (ok)`));
+    if (state.status === 'running' && state.pid && state.pid !== process.pid && alive(state.pid)) return usageError(new ConfigError(`Run "${state.run}" is already running (pid ${state.pid})`));
+    cfg = state.config;
+    state.rounds = {};
+    if (flags.engine) cfg.engine = flags.engine;
+    if (flags.cap) { cfg.cap = Number(flags.cap); cfg.stop = Math.min(cfg.cap, Number(flags.stop || cfg.stop)); }
+    if (flags.wait) cfg.waitMin = Number(flags.wait);
+    if (flags['auto-approve']) cfg.autoApprove = true;
+    if (flags.subscription) cfg.subscription = true;
+    try { validate(cfg); } catch (e) { return usageError(e); }
   } else {
-    if (ENGINE === 'dry') await sleep(1500 * PACE);
-    emit('ops', 'tool', { summary: ENGINE === 'dry' ? 'Render disimulasikan (dry)' : 'final.sh belum ada di folder post' });
+    try { cfg = buildConfig(flags); } catch (e) { return usageError(e); }
+    let run;
+    try { run = resolveRunId(cfg); } catch (e) { return usageError(e); }
+    if (loadState(run)) return usageError(new ConfigError(`Run "${run}" already exists. Use --resume ${run}, or pick another --run`));
+    state = {
+      run, config: cfg, post: resolvePostDir(cfg, run), status: 'running', stepIndex: 0, spent: 0, wrapped: false,
+      rounds: {}, seats: {}, history: [], revision: null, startedAt: new Date().toISOString(), elapsed: 0,
+    };
   }
-  emit('ops', 'done', { summary: `video/${RUN}.mp4` });
+  if (cfg.engine === 'claude-cli' && !claudeInstalled()) {
+    return usageError(new ConfigError('Claude Code (`claude`) was not found. Install it and log in once (`claude`), or use --engine dry'));
+  }
+  if (cfg.engine === 'claude-cli' && process.env.ANTHROPIC_API_KEY && !cfg.subscription) {
+    console.warn('Note: ANTHROPIC_API_KEY is set, so Claude Code bills the API. Add --subscription to use your Claude subscription instead.');
+  }
+  const runner = new Runner(state);
+  let code;
+  try { code = await runner.go(!!flags.resume); }
+  catch (e) { console.error(e); code = runner.finish('error', `Kesalahan tak terduga: ${e.message}`); }
+  await Promise.allSettled(runner.pending);   // let webhook / ntfy notifications finish
+  return code;
 }
 
-main().catch((e) => { emit('producer', 'blocked', { summary: String(e.message).slice(0, 90) }); console.error(e); process.exit(1); });
+function alive(pid) { try { process.kill(pid, 0); return true; } catch { return false; } }
+
+function usageError(e) {
+  console.error(`Error: ${e.message}\nRun with --help for options.`);
+  return e instanceof ConfigError ? 2 : 1;
+}
+
+class Runner {
+  constructor(state) {
+    this.s = state; this.cfg = state.config; this.run = state.run; this.post = state.post;
+    this.steps = pipelineFor(this.cfg);
+    this.child = null; this.done = false; this.pending = [];
+    this.emit = createEmitter(this.run, { offsetSec: state.elapsed || 0 });
+    this.verdictPlan = parseDryVerdicts(this.cfg.dryVerdicts);
+    fs.mkdirSync(this.post, { recursive: true });
+  }
+
+  save() { this.s.elapsed = this.emit.elapsed(); saveState(this.s); }
+
+  async go(resumed) {
+    this.s.pid = process.pid;
+    const stop = () => { if (!this.done) { killTree(this.child); this.finish('cancelled', 'Dibatalkan'); } };
+    process.once('SIGINT', stop); process.once('SIGTERM', stop);
+    if (!resumed) {
+      const t = this.cfg.templateInfo;
+      this.emit('producer', 'run_start', {
+        template: this.cfg.template, kreator: this.cfg.kreator, phase: this.cfg.phase, engine: this.cfg.engine,
+        cap: this.cfg.cap, wrap: this.cfg.wrap, stop: this.cfg.stop, stages: [...new Set(this.steps.map((s) => s.stage).filter(Boolean))],
+        summary: `${this.cfg.slot}: ${this.cfg.topic}`, model: 'haiku', effort: 'low',
+      });
+      if (t.needsImageGen) this.emit('producer', 'tool', { summary: `Templat ${t.name} butuh generator gambar dari kamu` });
+    } else {
+      const at = this.steps[this.s.stepIndex]?.id || 'akhir';
+      this.emit('producer', 'tool', { summary: `Lanjut run dari langkah ${at}` });
+    }
+    this.s.status = 'running'; this.s.waiting = null; this.s.reason = null; this.save();
+
+    for (let i = this.s.stepIndex; i < this.steps.length; i++) {
+      if (this.done) return EXIT[this.s.status];
+      this.s.stepIndex = i; this.save();
+      const step = this.steps[i];
+      const r = await this.dispatch(step);
+      if (this.done) return EXIT[this.s.status];
+      if (r?.park) { this.park(r.park); return 0; }
+      if (r?.goto) { i = this.steps.findIndex((s) => s.id === r.goto) - 1; continue; }
+      this.s.stepIndex = i + 1; this.save();
+      if (this.cfg.until && step.id === this.cfg.until) return this.finish('partial', `Berhenti setelah ${step.id} (--until)`);
+    }
+    return this.finish('ok');
+  }
+
+  dispatch(step) {
+    switch (step.kind) {
+      case 'approval': return this.approval(step);
+      case 'human': return this.human(step);
+      case 'render': return this.render(step);
+      case 'publish': return this.publish(step);
+      case 'register': return this.register(step);
+      default: return this.agent(step);
+    }
+  }
+
+  // ---------- agent steps ----------
+  async agent(step, { synthetic = false } = {}) {
+    const c = this.cfg, s = this.s;
+    if (c.engine === 'api' && step.needsFiles) {
+      return this.finish('partial', `Engine api tidak bisa mengedit berkas. Lanjutkan: --resume ${this.run} dengan claude-cli`, { resumeEngine: true });
+    }
+    if (s.spent >= c.cap) return this.finish('over_budget', `Batas $${c.cap} tercapai sebelum ${step.id}`);
+    if (s.spent >= c.stop) {
+      if (step.optional) { this.emit(step.seat, 'budget', { level: 'stop', summary: `Stop $${s.spent.toFixed(2)}: ${step.id} dilewati, tulis manual` }); this.skipped(step); return null; }
+      return this.finish('over_budget', `Garis stop $${c.stop} tercapai sebelum ${step.id}`);
+    }
+    if (!s.wrapped && s.spent >= c.wrap) { s.wrapped = true; this.emit('producer', 'budget', { level: 'wrap_up', summary: `Wrap-up: $${s.spent.toFixed(2)} dari $${c.cap}. Selesaikan, jangan tambah adegan` }); }
+    if (s.wrapped && step.optional) { this.emit(step.seat, 'budget', { level: 'wrap_up', summary: `Wrap-up: ${step.id} opsional dilewati, tulis manual` }); this.skipped(step); return null; }
+
+    const turns = turnsAllowed(step, c.stop - s.spent);
+    if (turns < step.size[0]) {
+      s.wrapped = true;
+      this.emit('producer', 'budget', { level: 'wrap_up', summary: `${step.id}: dibatasi ${turns}/${step.size[0]} giliran agar di bawah $${c.stop}` });
+    }
+    const revision = s.revision?.target === step.id ? s.revision : null;
+    if (step.precheck && !synthetic) {
+      const r = await this.freeCheck(step.precheck, step, 'periksa.txt');
+      if (this.done) return null;
+      if (r && !r.pass) return this.gateFail(step, step, r.reason, `${step.id}:pre`);
+    }
+    this.emit(step.seat, 'task_start', { summary: fill(step.say, c), model: step.model, effort: step.effort, stage: step.stage, task: step.id });
+    this.emit(step.seat, 'thinking', { summary: revision ? `Revisi: ${revision.reason}` : (step.wrapAware && s.wrapped ? 'Mode hemat: selesaikan yang ada' : fill(step.say, c)) });
+
+    let out, attempt = 0, note = revision;
+    for (;;) {
+      const startedAt = Date.now();
+      const ctx = {
+        cfg: c, run: this.run, post: this.post, wrapped: s.wrapped, revision: note, turns,
+        budget: Math.max(0.01, c.cap - s.spent), emit: this.emit, setChild: (ch) => (this.child = ch),
+        dryVerdict: (id) => this.verdictPlan(id),
+      };
+      out = await ENGINE_FNS[c.engine](step, ctx);
+      this.addCost(step, out);
+      if (this.done) return null;
+      if (out.ok) {
+        captureOutputs(this.post, step, out.text, { inline: c.engine === 'api' });
+        const missing = missingOutputs(this.post, step, startedAt);
+        if (!missing.length) break;
+        out = { ok: false, error: `${step.seat} tidak menulis ${missing.join(', ')}` };
+      }
+      if (s.spent >= c.cap || out.budget || /budget/.test(out.error || '')) return this.finish('over_budget', `${step.id}: ${out.error || 'anggaran habis'}`);
+      if (out.auth) return this.finish('error', `Login/kunci API bermasalah: ${out.error}`);
+      if (attempt >= c.retries) return this.finish('error', `${step.id} gagal: ${out.error}`);
+      attempt++;
+      this.emit(step.seat, 'blocked', { summary: `${out.error}. Coba lagi (${attempt}/${c.retries})` });
+      note = { round: attempt, reason: out.error };
+    }
+    if (revision) s.revision = null;
+    s.history.push({ step: step.id, seat: step.seat, usd: +out.usd.toFixed(4), at: new Date().toISOString(), summary: summaryOf(out.text, `${step.id} selesai`) });
+    if (s.spent > c.cap) return this.finish('over_budget', `Total $${s.spent.toFixed(2)} melewati batas $${c.cap}`);
+    if (synthetic) return out;
+
+    if (step.checks) {
+      const r = await this.freeCheck(step.checks, step, 'cek.txt');
+      if (r && !r.pass) return this.gateFail(step, { ...step, revise: step.id }, r.reason, `${step.id}:cek`);
+    }
+    if (step.gate) {
+      const text = step.capture ? fs.readFileSync(path.join(this.post, step.capture), 'utf8') : out.text;
+      const g = parseGate(step.gate, text);
+      if (!g.pass) {
+        if (step.gate === 'READY') return this.finish('blocked', `Gerbang akurasi: ${g.reason}`);
+        return this.gateFail(step, step, g.reason, step.id);
+      }
+    }
+    this.emit(step.seat, 'done', { summary: summaryOf(out.text, `${step.id} selesai`) });
+    if (step.handoff) this.emit(step.seat, 'handoff', { to: step.handoff, summary: summaryOf(out.text, `${step.id} siap`) });
+    return null;
+  }
+
+  gateFail(step, gateStep, reason, key) {
+    const s = this.s;
+    s.rounds[key] = (s.rounds[key] || 0) + 1;
+    this.emit(step.seat, 'blocked', { summary: `BLOCK: ${reason}` });
+    if (gateStep.revise && s.rounds[key] <= this.cfg.rounds) {
+      const target = this.steps.find((x) => x.id === gateStep.revise);
+      s.revision = { target: target.id, round: s.rounds[key], reason };
+      this.emit(step.seat, 'handoff', { to: target.seat, summary: `Kembalikan ke ${target.id}: ${reason}` });
+      return { goto: target.id };
+    }
+    return this.finish('blocked', `${step.id} BLOCK setelah ${s.rounds[key] - 1} revisi: ${reason}`);
+  }
+
+  addCost(step, out) {
+    const usd = out.usd || 0;
+    this.s.spent += usd;
+    this.s.seats[step.seat] = +((this.s.seats[step.seat] || 0) + usd).toFixed(4);
+    if (usd > 0 || out.ok) this.emit(step.seat, 'cost', { usd: +usd.toFixed(4), usage: out.usage || {}, model: step.model });
+    this.save();
+  }
+
+  skipped(step) { this.s.history.push({ step: step.id, seat: step.seat, usd: 0, skipped: true, at: new Date().toISOString() }); }
+
+  // ---------- free scripts ----------
+  async freeCheck(name, step, outFile) {
+    if (this.cfg.engine === 'dry') { this.emit(step.seat, 'tool', { summary: `${name}: dilewati (dry)` }); return null; }
+    const cmd = findCommand(PIPELINE.checks[name], this.vars(), this.cfg.kreator);
+    if (!cmd) { this.emit(step.seat, 'tool', { summary: `${name}: skrip tidak ditemukan, dilewati (atur di pipeline.json)` }); return null; }
+    this.emit(step.seat, 'tool', { summary: `${name}: ${cmd.cmd.slice(0, 3).join(' ')}` });
+    const r = await runCommand(cmd.cmd, { cwd: cmd.cwd, onSpawn: (c) => (this.child = c) });
+    fs.writeFileSync(path.join(this.post, outFile), r.out);
+    if (r.code !== 0) return { pass: false, reason: `${name} gagal (kode ${r.code}): ${r.out.trim().split('\n').slice(-1)[0] || ''}`.slice(0, 160) };
+    this.emit(step.seat, 'tool', { summary: `${name}: lolos` });
+    return { pass: true };
+  }
+  vars() {
+    return { repo: this.cfg.repo, post: this.post, postRel: path.relative(this.cfg.repo, this.post).split(path.sep).join('/'), run: this.run, video: this.s.video || '' };
+  }
+
+  // ---------- humans ----------
+  async waitFor(check, label) {
+    const until = Date.now() + this.cfg.waitMin * 60000;
+    for (;;) {
+      const r = check();
+      if (r) return r;
+      if (this.done) return null;
+      if (Date.now() >= until) return null;
+      await sleep(this.cfg.engine === 'dry' ? 500 : 3000);
+    }
+  }
+
+  async human(step) {
+    const who = step.who, dir = path.join(this.post, step.dir);
+    const name = who === 'aina' ? 'Aina' : 'Ulza';
+    if (this.cfg.skipVoice) { this.emit('producer', 'tool', { summary: `Rekaman ${name} dilewati (--skip-voice)` }); return null; }
+    const found = () => fs.existsSync(dir) && fs.readdirSync(dir).find((f) => step.ext.includes(f.split('.').pop().toLowerCase()));
+    if (!found()) {
+      this.emit('producer', 'waiting_human', { to: who, summary: fill(step.say, this.cfg) });
+      this.emit(who, 'task_start', { summary: step.dir === 'voice' ? 'Rekam suara di booth' : 'Rekam di depan kamera', stage: step.stage });
+      this.notify('recording', `${name}: naskah siap. Simpan rekaman di ${dir}`);
+      if (this.cfg.engine === 'dry') {
+        await sleep(3000 * this.cfg.pace);
+        fs.mkdirSync(dir, { recursive: true });
+        fs.writeFileSync(path.join(dir, `dry.${step.ext[0]}`), 'DRY RUN placeholder');
+      }
+      this.setWaiting({ kind: 'human', name: step.dir, who, dir });
+      const f = await this.waitFor(found, 'recording');
+      this.setWaiting(null);
+      if (this.done) return null;
+      if (!f) return { park: { kind: 'human', name: step.dir, who, dir } };
+    }
+    this.emit(who, 'done', { summary: `Rekaman masuk: ${found()}` });
+    this.emit('producer', 'handoff', { to: step.handoff || 'ops', summary: 'Rekaman masuk, lanjut' });
+    return null;
+  }
+
+  async approval(step) {
+    if (!step.required && !this.cfg.approve.includes(step.name)) return null;
+    const dir = path.join(runDir(this.run), 'approvals'), file = path.join(dir, `${step.name}.json`);
+    fs.mkdirSync(dir, { recursive: true });
+    const read = () => { try { return fs.existsSync(file) && JSON.parse(fs.readFileSync(file, 'utf8')); } catch { return null; } };
+    if (!read()) {
+      this.emit('producer', 'approval', { name: step.name, to: 'ulza', summary: fill(step.say, this.cfg) });
+      this.notify('approval', `Perlu persetujuan: ${step.name}. Buka office atau tulis ${file}`);
+      if (this.cfg.autoApprove) fs.writeFileSync(file, JSON.stringify({ decision: 'approve', note: 'auto', at: new Date().toISOString() }));
+    }
+    if (!read()) this.setWaiting({ kind: 'approval', name: step.name });
+    const d = await this.waitFor(read, 'approval');
+    this.setWaiting(null);
+    if (this.done) return null;
+    if (!d) return { park: { kind: 'approval', name: step.name } };
+    this.emit('producer', 'decision', { name: step.name, decision: d.decision, summary: `${step.name}: ${d.decision === 'approve' ? 'disetujui' : 'ditolak'}${d.note ? ' · ' + d.note : ''}` });
+    if (d.decision === 'approve') return null;
+    // rejected: keep the record, clear the request, send the work back once or twice
+    fs.renameSync(file, path.join(dir, `${step.name}.rejected-${Date.now()}.json`));
+    const back = { brief: 'brief', script: 'script', final: this.steps.find((x) => x.id === 'animate' || x.id === 'edit')?.id, plan: 'scope', kit: 'build' }[step.name];
+    const key = `approval:${step.name}`;
+    this.s.rounds[key] = (this.s.rounds[key] || 0) + 1;
+    if (back && this.s.rounds[key] <= 2) {
+      const target = this.steps.find((x) => x.id === back);
+      this.s.revision = { target: back, round: this.s.rounds[key], reason: `Ditolak Ulza: ${d.note || 'tanpa catatan'}` };
+      this.emit('producer', 'handoff', { to: target.seat, summary: `Revisi ${back}: ${d.note || 'ditolak'}` });
+      return { goto: back };
+    }
+    return this.finish('rejected', `${step.name} ditolak: ${d.note || ''}`);
+  }
+
+  notify(kind, text) { this.pending.push(notify(this.run, kind, text)); }
+
+  setWaiting(w) {
+    if (this.done) return;
+    this.s.waiting = w ? { ...w, since: new Date().toISOString() } : null;
+    this.s.status = w ? 'waiting' : 'running';
+    this.save();
+  }
+
+  park(waiting) {
+    this.s.status = 'parked'; this.s.waiting = { ...waiting, since: new Date().toISOString() };
+    this.emit('producer', 'parked', { summary: waiting.kind === 'approval' ? `Menunggu persetujuan ${waiting.name}; lanjut lewat office` : `Menunggu rekaman ${waiting.who}; lanjut otomatis saat berkas masuk` });
+    this.save();
+    console.log(`\nParked: waiting for ${waiting.kind} (${waiting.name}). Continue with: node orchestrator/run.mjs --resume ${this.run}`);
+  }
+
+  // ---------- render, publish, register ----------
+  async render(step) {
+    const started = Date.now();
+    let mentioned = [];
+    this.emit('ops', 'task_start', { summary: 'Render (skrip, tanpa agen)', model: 'none', effort: 'none', stage: step.stage, task: 'render' });
+    if (this.cfg.engine === 'dry') {
+      await sleep(1500 * this.cfg.pace);
+      fs.mkdirSync(path.join(this.post, 'video'), { recursive: true });
+      fs.writeFileSync(path.join(this.post, 'video', `${this.run}.mp4`), 'DRY RUN placeholder, not a real video');
+      this.emit('ops', 'tool', { summary: 'Render disimulasikan (dry)' });
+    } else {
+      const R = PIPELINE.render;
+      const cmd = findCommand([R[this.cfg.template], R.default].filter(Boolean), this.vars(), this.cfg.kreator);
+      if (cmd) {
+        this.emit('ops', 'tool', { summary: cmd.cmd.join(' ') });
+        const r = await runCommand(cmd.cmd, { cwd: cmd.cwd, timeoutMs: 60 * 60000, onSpawn: (c) => (this.child = c) });
+        fs.writeFileSync(path.join(this.post, 'render.log'), r.out);
+        if (this.done) return null;
+        if (r.code !== 0) return this.finish('error', `Render gagal (kode ${r.code}), lihat render.log`);
+      } else if (this.cfg.engine === 'claude-cli') {
+        this.emit('ops', 'tool', { summary: 'Tidak ada skrip render; Opi Ops menjalankan office-ops' });
+        const opsStep = { id: 'render', seat: 'ops', model: 'haiku', effort: 'low', stage: step.stage, size: [8, 20000, 2000, 600],
+          say: 'Render video sesuai office-ops.md, lalu laporkan path mp4', reads: ['animasi.md', 'script.json'] };
+        const out = await this.agent(opsStep, { synthetic: true });
+        if (this.done || !out) return null;
+        mentioned = [...out.text.matchAll(/([^\s`'"()]+\.mp4)\b/gi)].map((m) => path.resolve(this.cfg.repo, m[1]));
+      } else {
+        return this.finish('error', 'Tidak ada skrip render untuk templat ini (atur render di data/pipeline.json)');
+      }
+    }
+    const video = findVideo([path.join(this.cfg.repo, 'video', `${this.run}.mp4`), ...mentioned], this.post, started);
+    if (!video) return this.finish('error', 'Render tidak menghasilkan berkas mp4');
+    this.s.video = video;
+    this.emit('ops', 'done', { summary: `Video: ${path.basename(video)}` });
+    this.emit('ops', 'handoff', { to: 'critic', summary: 'Video siap diperiksa' });
+    this.save();
+    return null;
+  }
+
+  async publish(step) {
+    this.emit('ops', 'task_start', { summary: 'Siapkan paket tayang', model: 'none', effort: 'none', stage: step.stage, task: 'publish' });
+    let video = this.s.video;
+    if (this.cfg.engine !== 'dry' && video) {
+      const dest = path.join(this.cfg.repo, 'video', `${this.run}.mp4`);
+      if (path.resolve(dest) !== path.resolve(video)) { fs.mkdirSync(path.dirname(dest), { recursive: true }); fs.copyFileSync(video, dest); video = dest; }
+    }
+    const caption = fs.existsSync(path.join(this.post, 'caption-ig.md'));
+    const pkg = {
+      run: this.run, kreator: this.cfg.kreator, slot: this.cfg.slot, platforms: this.cfg.platforms, template: this.cfg.template,
+      video, caption: caption ? path.join(this.post, 'caption-ig.md') : null, status: 'ready_to_publish', dry: this.cfg.engine === 'dry',
+      note: 'Upload manually (or with your scheduler) at the slot time. Nothing is posted automatically.',
+    };
+    fs.writeFileSync(path.join(this.post, 'publish.json'), JSON.stringify(pkg, null, 2));
+    if (!caption) this.emit('ops', 'tool', { summary: 'Caption belum ada: tulis manual sebelum tayang' });
+    this.emit('ops', 'done', { summary: `Siap tayang ${this.cfg.slot}: publish.json` });
+    this.notify('ready', `Siap tayang ${this.cfg.slot}: ${video || 'video'}`);
+    return null;
+  }
+
+  async register(step) {
+    this.emit('ops', 'task_start', { summary: 'Daftarkan templat sebagai siap', model: 'none', effort: 'none', stage: step.stage, task: 'register' });
+    if (this.cfg.engine === 'dry') { this.emit('ops', 'done', { summary: 'dry: templates.json tidak diubah' }); return null; }
+    const f = path.join(OFFICE, 'templates.json');
+    const j = JSON.parse(fs.readFileSync(f, 'utf8'));
+    const t = j.templates.find((x) => x.id === this.cfg.template);
+    t.status = 'ready'; t.adaptedRun = this.run; t.kit = path.relative(this.cfg.repo, this.post).split(path.sep).join('/');
+    fs.writeFileSync(f, JSON.stringify(j, null, 2) + '\n');
+    TEMPLATES.splice(0, TEMPLATES.length, ...j.templates);
+    this.emit('ops', 'done', { summary: `${t.name} siap dipakai` });
+    return null;
+  }
+
+  // ---------- end ----------
+  finish(status, reason = '', extra = {}) {
+    if (this.done) return EXIT[this.s.status];
+    this.done = true;
+    const s = this.s;
+    if (!END_STATUSES.includes(status)) status = 'error';
+    s.status = status; s.reason = reason || null; s.endedAt = new Date().toISOString(); s.waiting = null; Object.assign(s, extra);
+    const total = `$${s.spent.toFixed(2)} dari $${this.cfg.cap}`;
+    const text = {
+      ok: this.cfg.phase === 1 ? `Templat siap. Total ${total}` : `Siap tayang ${this.cfg.slot}. Total ${total}`,
+      partial: `${reason}. Total ${total}`, blocked: `Berhenti: ${reason}`, rejected: `Ditolak: ${reason}`,
+      over_budget: `Anggaran: ${reason}`, error: `Gagal: ${reason}`, cancelled: `Dibatalkan. Total ${total}`,
+    }[status];
+    this.emit('producer', 'run_end', { status, summary: text, total: +s.spent.toFixed(4) });
+    writeReport(s, this.steps);
+    appendLedger({ kind: 'run', run: this.run, kreator: this.cfg.kreator, template: this.cfg.template, engine: this.cfg.engine, phase: this.cfg.phase, status, usd: +s.spent.toFixed(4), seats: s.seats });
+    if (status !== 'ok') this.notify(status, text);
+    this.save();
+    console.log(`\n${status.toUpperCase()}: ${text}\nReport: ${path.join(runDir(this.run), 'report.md')}`);
+    return EXIT[status];
+  }
+}
+
+function findVideo(candidates, post, since) {
+  for (const c of candidates) if (fs.existsSync(c) && fs.statSync(c).mtimeMs >= since - 1000) return c;
+  const walk = (d, depth) => {
+    if (depth > 3 || !fs.existsSync(d)) return null;
+    for (const e of fs.readdirSync(d, { withFileTypes: true })) {
+      const p = path.join(d, e.name);
+      if (e.isDirectory() && !['footage', 'voice', 'node_modules'].includes(e.name)) { const r = walk(p, depth + 1); if (r) return r; }
+      else if (e.isFile() && /\.mp4$/i.test(e.name) && fs.statSync(p).mtimeMs >= since - 1000 && fs.statSync(p).size > 0) return p;
+    }
+    return null;
+  };
+  return walk(post, 0);
+}
+
+function parseDryVerdicts(spec) {
+  const plan = {};
+  for (const part of String(spec || '').split(';').filter(Boolean)) {
+    const [id, seq] = part.split('=');
+    plan[id.trim()] = (seq || '').split(',').map((x) => x.trim().toUpperCase());
+  }
+  const used = {};
+  return (id) => { const seq = plan[id]; if (!seq) return 'PASS'; const i = used[id] = (used[id] ?? -1) + 1; return seq[Math.min(i, seq.length - 1)]; };
+}
+
+function writeReport(s, steps) {
+  const c = s.config;
+  const rows = s.history.map((h) => `| ${h.step} | ${h.seat} | ${h.skipped ? 'skipped' : '$' + h.usd.toFixed(3)} | ${(h.summary || '').replace(/\|/g, '/')} |`).join('\n');
+  const files = fs.existsSync(s.post) ? fs.readdirSync(s.post).filter((f) => !f.startsWith('.')).join(', ') : '-';
+  const md = `# Run ${s.run}
+
+- Status: **${s.status}**${s.reason ? ` (${s.reason})` : ''}
+- Topic: ${c.topic} · Slot: ${c.slot} · Kreator: ${c.kreator} · Template: ${c.template} · Phase ${c.phase}
+- Engine: ${c.engine}${c.engine === 'dry' ? ' (simulated, no model calls)' : ''}
+- Spend: $${s.spent.toFixed(3)} of $${c.cap} (wrap ${c.wrap}, stop ${c.stop})
+- Post folder: ${s.post}
+- Video: ${s.video || '-'}
+- Started ${s.startedAt} · ended ${s.endedAt || '-'}
+
+## Steps
+| Step | Seat | Cost | Summary |
+|---|---|---|---|
+${rows || '| - | - | - | - |'}
+
+## Spend per seat
+${Object.entries(s.seats).map(([k, v]) => `- ${k}: $${v.toFixed(3)}`).join('\n') || '- none'}
+
+## Files in the post folder
+${files}
+
+Pipeline: ${steps.map((x) => x.id).join(' → ')}
+`;
+  fs.writeFileSync(path.join(runDir(s.run), 'report.md'), md);
+}
+
+main().then((code) => process.exit(code ?? 0)).catch((e) => { console.error(e); process.exit(1); });

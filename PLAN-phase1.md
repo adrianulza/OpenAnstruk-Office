@@ -23,7 +23,7 @@ Budget for this build: $25 (one-off, 15 Nov 2026).
 
 - `index.html`, `js/*.js`, `vendor/three.module.min.js` (r160, from Studio explorations), `assets/logo.png`
 - `data/staff.json`, `data/sample-run.jsonl`, `docs/EVENTS.md`
-- `orchestrator/run.mjs` (dry mode works offline; API mode needs `ANTHROPIC_API_KEY`)
+- `orchestrator/run.mjs` (dry mode works offline; claude-cli uses Claude Code, with a subscription or a key; api mode needs `ANTHROPIC_API_KEY`)
 - `agents/*.md` (copy into `.claude/agents/`)
 - `template-picker.html` + `templates.json` (done), opened from the Template Board on the wall
 
@@ -32,3 +32,6 @@ Budget for this build: $25 (one-off, 15 Nov 2026).
 - $4 per-video guard in the orchestrator ($3.00 wrap-up, $3.60 stop).
 - No em dash in user-facing text; Bahasa Indonesia for content, English UI for now.
 - Frozen agent names `prose-critic`, `slide-critic` are used as-is.
+
+## Phase 2 (15 Nov 2026): from demo to working office
+See `docs/EVALUATION.md` (findings and fixes) and `docs/WORKFLOW.md` (how to use it). In short: Producer desk (chat, runs, approvals, uploads, costs), fail-closed gates, an enforced budget, a file contract between steps, resume, notifications, an Aina pipeline, a phase 1 pipeline, the local server, tests and CI.

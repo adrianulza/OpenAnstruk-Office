@@ -70,7 +70,7 @@ export function textSprite(text, { size = 40, bg = 'rgba(255,255,255,0.92)', fg 
   return s;
 }
 
-export function buildWorld(scene) {
+export function buildWorld(scene, { templateCount = 0 } = {}) {
   const world = new THREE.Group(); scene.add(world);
   const clickables = [];
   const anim = [];           // per-frame callbacks for ambient motion
@@ -152,7 +152,7 @@ export function buildWorld(scene) {
   const tbTex = canvasTex(1024, 640, (g, w, h) => {
     g.fillStyle = '#2b2340'; g.fillRect(0, 0, w, h);
     g.fillStyle = '#ff8a5b'; g.font = '800 64px system-ui'; g.fillText('TEMPLATE BOARD', 40, 90);
-    g.fillStyle = '#fff7ec'; g.font = '500 34px system-ui'; g.fillText('108 styles · click to choose', 40, 140);
+    g.fillStyle = '#fff7ec'; g.font = '500 34px system-ui'; g.fillText(`${templateCount ? templateCount + ' styles · ' : ''}click to choose`, 40, 140);
     const c = ['#ffe08a', '#ffc2d1', '#bde7ff', '#c8f2c2', '#f6c9c9', '#d6c9f6'];
     for (let i = 0; i < 12; i++) { g.fillStyle = c[i % 6]; g.fillRect(40 + (i % 6) * 160, 190 + Math.floor(i / 6) * 210, 140, 180); }
   });

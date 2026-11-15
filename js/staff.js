@@ -126,6 +126,17 @@ export class Character {
     this.goTo(z.desk, { pose: 'work', yaw: Math.atan2(look[0], look[1]), then });
   }
 
+  // Jump to the end of the current walk at once (used when seeking through a replay).
+  snap() {
+    if (!this.path.length) return false;
+    const [x, z] = this.path[this.path.length - 1];
+    this.root.position.x = x; this.root.position.z = z; this.path = [];
+    this.pose = this.arrivePose;
+    if (this.arriveYaw !== null && this.arriveYaw !== undefined) { this.yawTarget = this.arriveYaw; this.root.rotation.y = this.arriveYaw; }
+    const cb = this.onArrive; this.onArrive = null; if (cb) cb();
+    return true;
+  }
+
   update(dt, t) {
     this.bob += dt;
     // movement along the path

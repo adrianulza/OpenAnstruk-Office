@@ -1,0 +1,65 @@
+# Publishes the site to GitHub Pages on every push:
+#   main             -> https://adrianulza.github.io/OpenAnstruk-Office/
+#   any other branch -> https://adrianulza.github.io/OpenAnstruk-Office/preview/<branch-with-slashes-as-dashes>/
+#   list of previews -> https://adrianulza.github.io/OpenAnstruk-Office/preview/
+# The assembled site is pushed to the gh-pages branch, which Pages serves.
+name: Pages (main + branch previews)
+
+on:
+  push:
+    branches-ignore: [gh-pages]
+  delete:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: pages-publish
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Assemble main + every branch preview
+        run: |
+          set -euo pipefail
+          rm -rf _site && mkdir -p _site/preview
+          strip() { rm -rf "$1/.github" "$1/tools" "$1/test" "$1/runs"; }
+          esc() { sed -e 's/&/\&amp;/g' -e 's/</\&lt;/g' -e 's/>/\&gt;/g' -e 's/"/\&quot;/g'; }
+          git archive origin/main | tar -x -C _site
+          strip _site
+          items=""
+          for b in $(git for-each-ref --format='%(refname:lstrip=3)' refs/remotes/origin); do
+            case "$b" in HEAD|main|gh-pages) continue;; esac
+            slug=$(echo "$b" | tr -c 'A-Za-z0-9._\n-' '-')
+            mkdir -p "_site/preview/$slug"
+            git archive "origin/$b" | tar -x -C "_site/preview/$slug"
+            strip "_site/preview/$slug"
+            when=$(git log -1 --format='%cd' --date=format:'%Y-%m-%d %H:%M' "origin/$b")
+            msg=$(git log -1 --format='%s' "origin/$b" | esc)
+            name=$(echo "$b" | esc)
+            items="$items<li><a href=\"./$slug/\">$name</a> <small>$when · $msg</small></li>"
+          done
+          cat > _site/preview/index.html <<EOF
+          <!doctype html><meta charset="utf-8"><title>Branch previews</title>
+          <style>body{font:15px system-ui;max-width:760px;margin:40px auto;padding:0 16px}li{margin:8px 0}small{color:#666;margin-left:8px}</style>
+          <h1>Branch previews</h1><p><a href="../">main</a></p><ul>${items:-<li>No branches yet</li>}</ul>
+          EOF
+          touch _site/.nojekyll
+
+      - name: Push to gh-pages
+        run: |
+          set -euo pipefail
+          cd _site
+          git init -q -b gh-pages
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -q -m "Publish from ${GITHUB_REF_NAME} @ ${GITHUB_SHA::7}"
+          git push -f "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${GITHUB_REPOSITORY}.git" gh-pages

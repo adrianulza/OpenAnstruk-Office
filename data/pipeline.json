@@ -1,0 +1,111 @@
+{
+  "version": 2,
+  "note": "Single source of truth for steps, models, prices and guards. Prices are USD per million tokens and match the price table built into Claude Code 2.1.x (claude-*-5-5). The claude-cli engine uses the cost Claude Code reports; these prices are used for dry-run estimates, the api engine and the live per-step kill switch.",
+
+  "models": {
+    "opus":   { "cli": "opus",   "api": "claude-opus-5-5",   "in": 4.00, "out": 20.00, "read": 0.20, "write": 5.00 },
+    "sonnet": { "cli": "sonnet", "api": "claude-sonnet-5-5", "in": 2.00, "out": 10.00, "read": 0.10, "write": 2.50 },
+    "haiku":  { "cli": "haiku",  "api": "claude-haiku-5-5",  "in": 0.10, "out": 0.50,  "read": 0.01, "write": 0.125 }
+  },
+
+  "guard": {
+    "phase2": { "cap": 4.0, "wrap": 3.0, "stop": 3.6 },
+    "phase1": { "cap": 6.0, "wrap": 4.5, "stop": 5.4 }
+  },
+
+  "chat": { "model": "sonnet", "maxUSDPerMessage": 0.5, "tools": ["Read", "Grep", "Glob"] },
+
+  "posts": {
+    "openanstruk": "marketing/posts",
+    "aina": "aina/projects"
+  },
+
+  "render": {
+    "kolase-browser": { "cmd": ["node", "lib/reel/build.mjs", "{postRel}"], "cwd": "{repo}", "needs": "{repo}/lib/reel/build.mjs" },
+    "default":        { "cmd": ["bash", "final.sh"], "cwd": "{post}", "needs": "{post}/final.sh" }
+  },
+
+  "checks": {
+    "naskah": [
+      { "kreator": "aina",        "cmd": ["node", "tools/naskah/cek-naskah.mjs", "{post}/naskah.md"], "cwd": "{repo}", "needs": "{repo}/tools/naskah/cek-naskah.mjs" },
+      { "kreator": "openanstruk", "cmd": ["node", "tools/preflight.mjs", "{post}"],                   "cwd": "{repo}", "needs": "{repo}/tools/preflight.mjs" }
+    ],
+    "periksa": [
+      { "cmd": ["node", "tools/periksa-reel.mjs", "{video}"],     "cwd": "{repo}", "needs": "{repo}/tools/periksa-reel.mjs" },
+      { "cmd": ["node", "lib/reel/periksa-reel.mjs", "{video}"],  "cwd": "{repo}", "needs": "{repo}/lib/reel/periksa-reel.mjs" }
+    ]
+  },
+
+  "pipelines": {
+    "openanstruk": [
+      { "id": "brief",     "seat": "producer",     "model": "haiku",  "effort": "low",    "stage": "Brief",   "size": [6, 15000, 2000, 800],
+        "say": "Brief: {topic} ({slot}), templat {template}", "capture": "brief.md", "gate": "READY", "handoff": "researcher" },
+      { "id": "ok-brief",  "kind": "approval", "name": "brief", "say": "Setujui brief sebelum riset" },
+      { "id": "research",  "seat": "researcher",   "model": "sonnet", "effort": "medium", "stage": "Riset",   "size": [8, 30000, 3000, 1200],
+        "say": "Cek fakta: setiap angka bersumber dan bertanggal", "reads": ["brief.md"], "writes": ["fakta.md"], "handoff": "scriptwriter" },
+      { "id": "script",    "seat": "scriptwriter", "model": "opus",   "effort": "high",   "stage": "Naskah",  "size": [5, 35000, 2000, 3000],
+        "say": "Naskah lisan + script.json, hook tanpa angka", "reads": ["brief.md", "fakta.md", "critic.md?", "atensi.md?", "cek.txt?"], "writes": ["naskah.md", "script.json"],
+        "checks": "naskah", "handoff": "critic" },
+      { "id": "critique",  "seat": "critic",       "model": "opus",   "effort": "medium", "stage": "Kritik",  "size": [4, 35000, 3000, 1500],
+        "say": "naskah-critic, satu putaran", "reads": ["fakta.md", "naskah.md", "script.json"], "capture": "critic.md", "gate": "VERDICT", "revise": "script" },
+      { "id": "attention", "seat": "critic",       "model": "sonnet", "effort": "low",    "stage": "Kritik",  "size": [4, 30000, 2000, 1200],
+        "say": "attention-check mode 1", "reads": ["naskah.md", "script.json"], "capture": "atensi.md", "gate": "VERDICT", "revise": "script", "handoff": "animator" },
+      { "id": "ok-script", "kind": "approval", "name": "script", "say": "Setujui naskah sebelum animasi dan rekaman" },
+      { "id": "animate",   "seat": "animator",     "model": "sonnet", "effort": "high",   "stage": "Animasi", "size": [25, 60000, 3000, 2500],
+        "say": "Isi templat {template}: adegan, isyarat kata", "reads": ["brief.md", "fakta.md", "naskah.md", "script.json", "qa.md?"], "writes": ["animasi.md"],
+        "needsFiles": true, "wrapAware": true },
+      { "id": "voice",     "kind": "human", "who": "ulza", "stage": "Rekam", "dir": "voice", "ext": ["wav", "m4a", "mp3"],
+        "say": "Ulza, rekam sesuai script.json lalu simpan di folder voice/" },
+      { "id": "render",    "kind": "render", "seat": "ops", "stage": "Render" },
+      { "id": "qa",        "seat": "critic",       "model": "sonnet", "effort": "low",    "stage": "QA",      "size": [3, 25000, 2000, 1000],
+        "say": "attention-check mode 2: periksa hasil render", "reads": ["script.json", "periksa.txt?", "animasi.md"], "capture": "qa.md", "gate": "VERDICT", "revise": "animate",
+        "precheck": "periksa" },
+      { "id": "captions",  "seat": "scriptwriter", "model": "sonnet", "effort": "medium", "stage": "Caption", "size": [3, 25000, 2000, 1500],
+        "say": "Caption IG, judul TikTok dan YouTube", "reads": ["brief.md", "naskah.md"], "writes": ["caption-ig.md"], "optional": true },
+      { "id": "ok-final",  "kind": "approval", "name": "final", "say": "Setujui video final sebelum tayang" },
+      { "id": "publish",   "kind": "publish", "seat": "ops", "stage": "Siap tayang" }
+    ],
+
+    "aina": [
+      { "id": "brief",     "seat": "producer",     "model": "haiku",  "effort": "low",    "stage": "Brief",   "size": [6, 15000, 2000, 800],
+        "say": "Brief Aina: {topic} ({slot}), templat {template}", "capture": "brief.md", "gate": "READY", "handoff": "researcher" },
+      { "id": "ok-brief",  "kind": "approval", "name": "brief", "say": "Setujui brief sebelum riset" },
+      { "id": "research",  "seat": "researcher",   "model": "sonnet", "effort": "medium", "stage": "Riset",   "size": [8, 30000, 3000, 1200],
+        "say": "Riset Aina: titik panas, sumber primer", "reads": ["brief.md"], "writes": ["fakta.md"], "handoff": "scriptwriter" },
+      { "id": "script",    "seat": "scriptwriter", "model": "opus",   "effort": "high",   "stage": "Naskah",  "size": [5, 35000, 2000, 3000],
+        "say": "Naskah Aina, suara asli dilindungi", "reads": ["brief.md", "fakta.md", "critic.md?", "atensi.md?", "cek.txt?"], "writes": ["naskah.md", "script.json"],
+        "checks": "naskah", "handoff": "critic" },
+      { "id": "critique",  "seat": "critic",       "model": "opus",   "effort": "medium", "stage": "Kritik",  "size": [4, 35000, 3000, 1500],
+        "say": "naskah-critic untuk Aina", "reads": ["fakta.md", "naskah.md", "script.json"], "capture": "critic.md", "gate": "VERDICT", "revise": "script" },
+      { "id": "attention", "seat": "critic",       "model": "sonnet", "effort": "low",    "stage": "Kritik",  "size": [4, 30000, 2000, 1200],
+        "say": "attention-check mode 1", "reads": ["naskah.md", "script.json"], "capture": "atensi.md", "gate": "VERDICT", "revise": "script" },
+      { "id": "ok-script", "kind": "approval", "name": "script", "say": "Setujui naskah sebelum Aina rekam" },
+      { "id": "footage",   "kind": "human", "who": "aina", "stage": "Rekam", "dir": "footage", "ext": ["mp4", "mov", "m4a", "wav"],
+        "say": "Aina, rekam di depan kamera lalu simpan di folder footage/", "handoff": "animator" },
+      { "id": "edit",      "seat": "animator",     "model": "sonnet", "effort": "high",   "stage": "Edit",    "size": [20, 55000, 3000, 2200],
+        "say": "Transkrip large-v3 (id), DeepFilterNet, potong dan overlay", "reads": ["brief.md", "naskah.md", "script.json", "qa.md?"], "writes": ["animasi.md"],
+        "needsFiles": true, "wrapAware": true },
+      { "id": "render",    "kind": "render", "seat": "ops", "stage": "Render" },
+      { "id": "qa",        "seat": "critic",       "model": "sonnet", "effort": "low",    "stage": "QA",      "size": [3, 25000, 2000, 1000],
+        "say": "Periksa hasil render Aina", "reads": ["script.json", "periksa.txt?", "animasi.md"], "capture": "qa.md", "gate": "VERDICT", "revise": "edit",
+        "precheck": "periksa" },
+      { "id": "captions",  "seat": "scriptwriter", "model": "sonnet", "effort": "medium", "stage": "Caption", "size": [3, 25000, 2000, 1500],
+        "say": "Caption Aina dan judul", "reads": ["brief.md", "naskah.md"], "writes": ["caption-ig.md"], "optional": true },
+      { "id": "ok-final",  "kind": "approval", "name": "final", "say": "Setujui video final sebelum tayang" },
+      { "id": "publish",   "kind": "publish", "seat": "ops", "stage": "Siap tayang" }
+    ],
+
+    "phase1": [
+      { "id": "scope",     "seat": "producer",     "model": "haiku",  "effort": "low",    "stage": "Rencana", "size": [6, 15000, 2000, 900],
+        "say": "Rencana adaptasi templat {template} ke 9:16 kita", "capture": "brief.md", "gate": "READY", "handoff": "animator" },
+      { "id": "ok-plan",   "kind": "approval", "name": "plan", "required": true, "say": "Setujui rencana dan biaya adaptasi templat" },
+      { "id": "build",     "seat": "animator",     "model": "sonnet", "effort": "high",   "stage": "Kit",     "size": [30, 60000, 3000, 2500],
+        "say": "Bangun kit templat {template}: 9:16, Bahasa Indonesia, brand", "reads": ["brief.md", "critic.md?"], "writes": ["animasi.md"],
+        "needsFiles": true, "wrapAware": true, "handoff": "critic" },
+      { "id": "review",    "seat": "critic",       "model": "opus",   "effort": "medium", "stage": "Kritik",  "size": [4, 35000, 3000, 1500],
+        "say": "slide-critic pada stills kit", "reads": ["brief.md", "animasi.md"], "capture": "critic.md", "gate": "VERDICT", "revise": "build" },
+      { "id": "ok-kit",    "kind": "approval", "name": "kit", "required": true, "say": "Setujui kit templat sebelum dipakai" },
+      { "id": "register",  "kind": "register", "seat": "ops", "stage": "Siap" }
+    ]
+  }
+}
