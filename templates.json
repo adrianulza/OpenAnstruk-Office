@@ -1,0 +1,2237 @@
+{
+ "version": 1,
+ "capUSD": 4,
+ "note": "Opuscar entries keep only names, one-liners and links (catalog data, MIT). Style prompts stay in ~/lemo-opuscar (CC BY-NC 4.0 + film-making permission); never copied into this repo.",
+ "templates": [
+  {
+   "id": "kolase-browser",
+   "name": "Kolase (browser)",
+   "category": "House: OpenAnstruk",
+   "uses": [
+    "Explainer reels",
+    "Myth vs fact"
+   ],
+   "basis": "templates/reel-kolase + lib/reel (0016-0018; 0018 best performer)",
+   "aspect": "9:16",
+   "voice": "Ulza / Ardi draft",
+   "kreator": [
+    "openanstruk"
+   ],
+   "estUSD": 1.8,
+   "status": "ready"
+  },
+  {
+   "id": "hf-3d-physics",
+   "name": "HyperFrames 3D physics",
+   "category": "House: OpenAnstruk",
+   "uses": [
+    "Earthquake behaviour",
+    "Structural failure"
+   ],
+   "basis": "posts 0023, 0024 kopdes (panggung.js, fisika.js, kerusakan.js)",
+   "aspect": "9:16",
+   "voice": "Ulza",
+   "kreator": [
+    "openanstruk"
+   ],
+   "estUSD": 2.5,
+   "status": "ready"
+  },
+  {
+   "id": "hf-map-data",
+   "name": "HyperFrames map + data",
+   "category": "House: OpenAnstruk",
+   "uses": [
+    "Megathrust",
+    "Hazard maps"
+   ],
+   "basis": "post 0024 megathrust (peta-indonesia.js, osilator.js)",
+   "aspect": "9:16",
+   "voice": "Ulza",
+   "kreator": [
+    "openanstruk",
+    "aina"
+   ],
+   "estUSD": 2.0,
+   "status": "ready"
+  },
+  {
+   "id": "motion-map",
+   "name": "Motion Map (Claude Motion look)",
+   "category": "House: shared",
+   "uses": [
+    "Point-by-point map stories",
+    "Quake epicentres",
+    "Flood and bridge sites"
+   ],
+   "basis": "bake-basemap.mjs + 0024 geo data + registry map blocks; reference: Claude Motion launch 0:50-1:05",
+   "aspect": "9:16",
+   "voice": "any",
+   "kreator": [
+    "openanstruk",
+    "aina"
+   ],
+   "estUSD": 1.8,
+   "status": "build kit first (Phase 1, ~$3.50)"
+  },
+  {
+   "id": "app-demo",
+   "name": "App demo",
+   "category": "House: OpenAnstruk",
+   "uses": [
+    "OpenANSTRUK feature CTA"
+   ],
+   "basis": "lib/capture-reel.mjs, post 0015a, hyperframes launch type",
+   "aspect": "9:16",
+   "voice": "Ulza",
+   "kreator": [
+    "openanstruk"
+   ],
+   "estUSD": 1.5,
+   "status": "ready"
+  },
+  {
+   "id": "aina-reel-penuh",
+   "name": "Aina reel penuh",
+   "category": "House: Aina",
+   "uses": [
+    "Advocacy explainer, on camera"
+   ],
+   "basis": "aina/projects/reel-02-v2-aina (sticker in diorama)",
+   "aspect": "9:16",
+   "voice": "Aina (recorded)",
+   "kreator": [
+    "aina"
+   ],
+   "estUSD": 1.8,
+   "status": "ready"
+  },
+  {
+   "id": "aina-reel-cepat",
+   "name": "Aina reel cepat",
+   "category": "House: Aina",
+   "uses": [
+    "Quick take, on camera + captions"
+   ],
+   "basis": "aina/JADWAL.md format",
+   "aspect": "9:16",
+   "voice": "Aina (recorded)",
+   "kreator": [
+    "aina"
+   ],
+   "estUSD": 0.95,
+   "status": "ready"
+  },
+  {
+   "id": "yt-long",
+   "name": "YouTube long form",
+   "category": "House: shared",
+   "uses": [
+    "3-8 min walkthrough"
+   ],
+   "basis": "STRATEGY.md section 6; no pipeline yet",
+   "aspect": "16:9",
+   "voice": "Ulza",
+   "kreator": [
+    "openanstruk"
+   ],
+   "estUSD": 3.5,
+   "status": "not built"
+  },
+  {
+   "id": "carousel",
+   "name": "IG carousel",
+   "category": "House: OpenAnstruk",
+   "uses": [
+    "Slides"
+   ],
+   "basis": "ig-carousel + 9 saved styles",
+   "aspect": "4:5",
+   "voice": "none",
+   "kreator": [
+    "openanstruk"
+   ],
+   "estUSD": 1.0,
+   "status": "paused since 27 Oct"
+  },
+  {
+   "id": "opuscar:archive-lighttable",
+   "name": "Archive Light Table",
+   "category": "Opuscar: Instruments & Evidence",
+   "uses": [
+    "Brand history",
+    "Archive stories",
+    "Museums"
+   ],
+   "film": "Two Seconds Short",
+   "line": "The telegram said 57 seconds; under a loupe, the Wrights' glass negatives and the archive say 59.",
+   "poster": "https://github.com/lemomo-ai/lemo-opuscar/raw/main/styles/archive-lighttable/poster.jpg",
+   "gallery": "https://lemomo-ai.github.io/lemo-opuscar/styles/archive-lighttable/",
+   "demoSec": 40.0,
+   "aspect": "16:9 (adapt to 9:16)",
+   "needsImageGen": false,
+   "recommended": true,
+   "estUSD": 2.5,
+   "adaptUSD": "one-off budget exception",
+   "status": "adapt first ('make it our own'), then reuse"
+  },
+  {
+   "id": "opuscar:art-deco",
+   "name": "Art Deco",
+   "category": "Opuscar: Graphic & Type",
+   "uses": [
+    "Luxury & hospitality",
+    "Galas",
+    "Invitations"
+   ],
+   "film": "Midnight at the Starlight Hotel",
+   "line": "A grand hotel, 1930: a bellboy races lifts and revolving doors to deliver one letter before midnight.",
+   "poster": "https://github.com/lemomo-ai/lemo-opuscar/raw/main/styles/art-deco/poster.jpg",
+   "gallery": "https://lemomo-ai.github.io/lemo-opuscar/styles/art-deco/",
+   "demoSec": 58.4,
+   "aspect": "16:9 (adapt to 9:16)",
+   "needsImageGen": false,
+   "recommended": false,
+   "estUSD": 2.5,
+   "adaptUSD": "one-off budget exception",
+   "status": "adapt first ('make it our own'), then reuse"
+  },
+  {
+   "id": "opuscar:ascii-crt",
+   "name": "CRT ASCII Terminal",
+   "category": "Opuscar: Film & Tape",
+   "uses": [
+    "Developer tools",
+    "Sci-fi",
+    "Tech brands"
+   ],
+   "film": "Tranquility.log",
+   "line": "A moon-base AI wakes after forty years to a signal from Earth, and replies by drawing “home” in characters.",
+   "poster": "https://github.com/lemomo-ai/lemo-opuscar/raw/main/styles/ascii-crt/poster.jpg",
+   "gallery": "https://lemomo-ai.github.io/lemo-opuscar/styles/ascii-crt/",
+   "demoSec": 59.8,
+   "aspect": "16:9 (adapt to 9:16)",
+   "needsImageGen": false,
+   "recommended": false,
+   "estUSD": 2.5,
+   "adaptUSD": "one-off budget exception",
+   "status": "adapt first ('make it our own'), then reuse"
+  },
+  {
+   "id": "opuscar:assembly-line-diagram",
+   "name": "Assembly-Line Diagram",
+   "category": "Opuscar: Line Diagrams",
+   "uses": [
+    "How a process works",
+    "Biology and medicine",
+    "Supply chains and pipelines"
+   ],
+   "film": "The Disassembly Line",
+   "line": "A body cut open as a factory that runs backwards: a 12:30 sandwich is taken apart station by station, and six hours later it runs for the bus.",
+   "poster": "https://github.com/lemomo-ai/lemo-opuscar/raw/main/styles/assembly-line-diagram/poster.jpg",
+   "gallery": "https://lemomo-ai.github.io/lemo-opuscar/styles/assembly-line-diagram/",
+   "demoSec": 54.9,
+   "aspect": "16:9 (adapt to 9:16)",
+   "needsImageGen": false,
+   "recommended": false,
+   "estUSD": 2.5,
+   "adaptUSD": "one-off budget exception",
+   "status": "adapt first ('make it our own'), then reuse"
+  },
+  {
+   "id": "opuscar:backrooms",
+   "name": "Liminal Found Footage",
+   "category": "Opuscar: Film & Tape",
+   "uses": [
+    "Horror",
+    "Mystery & ARG",
+    "Game teasers"
+   ],
+   "film": "Night Shift Orientation",
+   "line": "A new night-shift hire films their first night in an endless yellow office, following the rules on the wall.",
+   "poster": "https://github.com/lemomo-ai/lemo-opuscar/raw/main/styles/backrooms/poster.jpg",
+   "gallery": "https://lemomo-ai.github.io/lemo-opuscar/styles/backrooms/",
+   "demoSec": 59.7,
+   "aspect": "16:9 (adapt to 9:16)",
+   "needsImageGen": false,
+   "recommended": false,
+   "estUSD": 2.5,
+   "adaptUSD": "one-off budget exception",
+   "status": "adapt first ('make it our own'), then reuse"
+  },
+  {
+   "id": "opuscar:bauhaus-shapes",
+   "name": "Bauhaus Shapes",
+   "category": "Opuscar: Graphic & Type",
+   "uses": [
+    "Finance and economics explainers",
+    "Mechanisms and principles",
+    "Titles and chapter cards"
+   ],
+   "film": "COMPOUND",
+   "line": "One dot doubles every ten years: 128 after seventy, 6.02 without compounding, and the last ten years are worth all the rest.",
+   "poster": "https://github.com/lemomo-ai/lemo-opuscar/raw/main/styles/bauhaus-shapes/poster.jpg",
+   "gallery": "https://lemomo-ai.github.io/lemo-opuscar/styles/bauhaus-shapes/",
+   "demoSec": 52.0,
+   "aspect": "16:9 (adapt to 9:16)",
+   "needsImageGen": false,
+   "recommended": false,
+   "estUSD": 2.5,
+   "adaptUSD": "one-off budget exception",
+   "status": "adapt first ('make it our own'), then reuse"
+  },
+  {
+   "id": "opuscar:blueprint",
+   "name": "Blueprint",
+   "category": "Opuscar: Line Diagrams",
+   "uses": [
+    "Engineering",
+    "Hardware launches",
+    "Tech explainers"
+   ],
+   "film": "Patent Pending: The Cloud Catcher",
+   "line": "An inventor's blueprint draws, explodes and assembles a cloud-catching machine, and its revision cloud starts to rain.",
+   "poster": "https://github.com/lemomo-ai/lemo-opuscar/raw/main/styles/blueprint/poster.jpg",
+   "gallery": "https://lemomo-ai.github.io/lemo-opuscar/styles/blueprint/",
+   "demoSec": 46.7,
+   "aspect": "16:9 (adapt to 9:16)",
+   "needsImageGen": false,
+   "recommended": true,
+   "estUSD": 2.5,
+   "adaptUSD": "one-off budget exception",
+   "status": "adapt first ('make it our own'), then reuse"
+  },
+  {
+   "id": "opuscar:brick-toy",
+   "name": "Brick Toy",
+   "category": "Opuscar: 3D & Miniature",
+   "uses": [
+    "Toys & kids",
+    "Product builds",
+    "Space"
+   ],
+   "film": "Rocket from Spare Parts",
+   "line": "A brick astronaut builds a rocket from spare parts and flies to a brick moon.",
+   "poster": "https://github.com/lemomo-ai/lemo-opuscar/raw/main/styles/brick-toy/poster.jpg",
+   "gallery": "https://lemomo-ai.github.io/lemo-opuscar/styles/brick-toy/",
+   "demoSec": 54.0,
+   "aspect": "16:9 (adapt to 9:16)",
+   "needsImageGen": false,
+   "recommended": false,
+   "estUSD": 2.5,
+   "adaptUSD": "one-off budget exception",
+   "status": "adapt first ('make it our own'), then reuse"
+  },
+  {
+   "id": "opuscar:briefing-board",
+   "name": "Engineering Briefing Board",
+   "category": "Opuscar: Instruments & Evidence",
+   "uses": [
+    "Engineering",
+    "Option comparisons",
+    "Briefings"
+   ],
+   "film": "The Ship Decides",
+   "line": "Four bridge types are tested on one briefing wall, and the ship that must pass under picks the winner.",
+   "poster": "https://github.com/lemomo-ai/lemo-opuscar/raw/main/styles/briefing-board/poster.jpg",
+   "gallery": "https://lemomo-ai.github.io/lemo-opuscar/styles/briefing-board/",
+   "demoSec": 40.0,
+   "aspect": "16:9 (adapt to 9:16)",
+   "needsImageGen": false,
+   "recommended": true,
+   "estUSD": 2.5,
+   "adaptUSD": "one-off budget exception",
+   "status": "adapt first ('make it our own'), then reuse"
+  },
+  {
+   "id": "opuscar:caption-news",
+   "name": "Caption News",
+   "category": "Opuscar: Edit & Documentary",
+   "uses": [
+    "Social news",
+    "Report explainers",
+    "Data shorts"
+   ],
+   "film": "The Bee Ledger",
+   "line": "America lost 1.3 million bee colonies, yet the count rose 6 %: a news short that works with the sound off.",
+   "poster": "https://github.com/lemomo-ai/lemo-opuscar/raw/main/styles/caption-news/poster.jpg",
+   "gallery": "https://lemomo-ai.github.io/lemo-opuscar/styles/caption-news/",
+   "demoSec": 59.5,
+   "aspect": "16:9 (adapt to 9:16)",
+   "needsImageGen": false,
+   "recommended": true,
+   "estUSD": 2.5,
+   "adaptUSD": "one-off budget exception",
+   "status": "adapt first ('make it our own'), then reuse"
+  },
+  {
+   "id": "opuscar:cel-anime-80s",
+   "name": "80s Cel Anime",
+   "category": "Opuscar: Cartoons",
+   "uses": [
+    "Music videos",
+    "Game trailers",
+    "Nostalgia"
+   ],
+   "film": "City Lights, 1987",
+   "line": "A courier girl rides through a rain-soaked neon city to deliver a tape before the dawn launch.",
+   "poster": "https://github.com/lemomo-ai/lemo-opuscar/raw/main/styles/cel-anime-80s/poster.jpg",
+   "gallery": "https://lemomo-ai.github.io/lemo-opuscar/styles/cel-anime-80s/",
+   "demoSec": 59.0,
+   "aspect": "16:9 (adapt to 9:16)",
+   "needsImageGen": false,
+   "recommended": false,
+   "estUSD": 2.5,
+   "adaptUSD": "one-off budget exception",
+   "status": "adapt first ('make it our own'), then reuse"
+  },
+  {
+   "id": "opuscar:chalkboard",
+   "name": "Chalkboard",
+   "category": "Opuscar: Sketch & Board",
+   "uses": [
+    "Word origins",
+    "Myth-busting",
+    "Lessons"
+   ],
+   "film": "The Story of Chinese Characters",
+   "line": "Chalk writes a popular claim about two characters, wipes it, and traces 射 back three thousand years.",
+   "poster": "https://github.com/lemomo-ai/lemo-opuscar/raw/main/styles/chalkboard/poster.jpg",
+   "gallery": "https://lemomo-ai.github.io/lemo-opuscar/styles/chalkboard/",
+   "demoSec": 49.3,
+   "aspect": "16:9 (adapt to 9:16)",
+   "needsImageGen": false,
+   "recommended": false,
+   "estUSD": 2.5,
+   "adaptUSD": "one-off budget exception",
+   "status": "adapt first ('make it our own'), then reuse"
+  },
+  {
+   "id": "opuscar:circuit-board",
+   "name": "Circuit Board",
+   "category": "Opuscar: Light & Lines",
+   "uses": [
+    "Energy",
+    "Supply chains",
+    "Devices"
+   ],
+   "film": "Seven Milliseconds",
+   "line": "Rivers become copper traces as current runs 2,080 km from a dam to a phone charger.",
+   "poster": "https://github.com/lemomo-ai/lemo-opuscar/raw/main/styles/circuit-board/poster.jpg",
+   "gallery": "https://lemomo-ai.github.io/lemo-opuscar/styles/circuit-board/",
+   "demoSec": 60.0,
+   "aspect": "16:9 (adapt to 9:16)",
+   "needsImageGen": false,
+   "recommended": false,
+   "estUSD": 2.5,
+   "adaptUSD": "one-off budget exception",
+   "status": "adapt first ('make it our own'), then reuse"
+  },
+  {
+   "id": "opuscar:city-symphony",
+   "name": "City Symphony",
+   "category": "Opuscar: Edit & Documentary",
+   "uses": [
+    "City films",
+    "Music montages",
+    "Openers"
+   ],
+   "film": "One Day in New York",
+   "line": "One day in New York in time-lapse: rivers of light, a grid on the sixteenths, 1899 beside today.",
+   "poster": "https://github.com/lemomo-ai/lemo-opuscar/raw/main/styles/city-symphony/poster.jpg",
+   "gallery": "https://lemomo-ai.github.io/lemo-opuscar/styles/city-symphony/",
+   "demoSec": 52.0,
+   "aspect": "16:9 (adapt to 9:16)",
+   "needsImageGen": false,
+   "recommended": false,
+   "estUSD": 2.5,
+   "adaptUSD": "one-off budget exception",
+   "status": "adapt first ('make it our own'), then reuse"
+  },
+  {
+   "id": "opuscar:colored-pencil",
+   "name": "Colored-Pencil Science Illustration",
+   "category": "Opuscar: Painting & Illustration",
+   "uses": [
+    "Natural-science cutaways",
+    "Picture-book explainers",
+    "Hidden structures and processes"
+   ],
+   "film": "The Other Half",
+   "line": "Do trees feed each other? A pencil drawing sinks below the grass, follows one grain of sugar along a fungal thread to the next tree, and pulls back over a whole wood joined underground.",
+   "poster": "https://github.com/lemomo-ai/lemo-opuscar/raw/main/styles/colored-pencil/poster.jpg",
+   "gallery": "https://lemomo-ai.github.io/lemo-opuscar/styles/colored-pencil/",
+   "demoSec": 50.8,
+   "aspect": "16:9 (adapt to 9:16)",
+   "needsImageGen": false,
+   "recommended": false,
+   "estUSD": 2.5,
+   "adaptUSD": "one-off budget exception",
+   "status": "adapt first ('make it our own'), then reuse"
+  },
+  {
+   "id": "opuscar:comic-history",
+   "name": "Comic History Cartoon",
+   "category": "Opuscar: Cartoons",
+   "uses": [
+    "Territorial changes in history",
+    "Light explainers on geopolitics",
+    "Market share and turf-war stories"
+   ],
+   "film": "One Piece of Paper",
+   "line": "Alsace-Lorraine changed hands four times between 1871 and 1945: each time someone tore off the paper and pasted a new piece, and the woman living on it never moved.",
+   "poster": "https://github.com/lemomo-ai/lemo-opuscar/raw/main/styles/comic-history/poster.jpg",
+   "gallery": "https://lemomo-ai.github.io/lemo-opuscar/styles/comic-history/",
+   "demoSec": 51.0,
+   "aspect": "16:9 (adapt to 9:16)",
+   "needsImageGen": true,
+   "recommended": false,
+   "estUSD": 2.5,
+   "adaptUSD": "one-off budget exception",
+   "status": "adapt first ('make it our own'), then reuse"
+  },
+  {
+   "id": "opuscar:countdown",
+   "name": "Live Countdown Split-screen",
+   "category": "Opuscar: Edit & Documentary",
+   "uses": [
+    "Launches",
+    "Countdowns",
+    "Live events"
+   ],
+   "film": "Counting Itself Down",
+   "line": "The last minute of the Artemis II launch, uncut: one cell opens to nine, and they merge into one at ignition.",
+   "poster": "https://github.com/lemomo-ai/lemo-opuscar/raw/main/styles/countdown/poster.jpg",
+   "gallery": "https://lemomo-ai.github.io/lemo-opuscar/styles/countdown/",
+   "demoSec": 59.5,
+   "aspect": "16:9 (adapt to 9:16)",
+   "needsImageGen": false,
+   "recommended": false,
+   "estUSD": 2.5,
+   "adaptUSD": "one-off budget exception",
+   "status": "adapt first ('make it our own'), then reuse"
+  },
+  {
+   "id": "opuscar:crayon-book",
+   "name": "Crayon Picture Book",
+   "category": "Opuscar: Painting & Illustration",
+   "uses": [
+    "Picture books",
+    "Bedtime stories",
+    "Kids' learning"
+   ],
+   "film": "The Moon Can't Sleep",
+   "line": "The moon can't sleep, so a little girl climbs onto the roof to sing it a lullaby.",
+   "poster": "https://github.com/lemomo-ai/lemo-opuscar/raw/main/styles/crayon-book/poster.jpg",
+   "gallery": "https://lemomo-ai.github.io/lemo-opuscar/styles/crayon-book/",
+   "demoSec": 52.0,
+   "aspect": "16:9 (adapt to 9:16)",
+   "needsImageGen": false,
+   "recommended": false,
+   "estUSD": 2.5,
+   "adaptUSD": "one-off budget exception",
+   "status": "adapt first ('make it our own'), then reuse"
+  },
+  {
+   "id": "opuscar:crayon-world",
+   "name": "Crayon World 3D",
+   "category": "Opuscar: 3D & Miniature",
+   "uses": [
+    "Short stories",
+    "Tributes",
+    "Journeys"
+   ],
+   "film": "The Butterfly",
+   "line": "A first-person flight over a crayon village to one flower in an old man's garden; then his eyes, and what he says.",
+   "poster": "https://github.com/lemomo-ai/lemo-opuscar/raw/main/styles/crayon-world/poster.jpg",
+   "gallery": "https://lemomo-ai.github.io/lemo-opuscar/styles/crayon-world/",
+   "demoSec": 64.5,
+   "aspect": "16:9 (adapt to 9:16)",
+   "needsImageGen": false,
+   "recommended": false,
+   "estUSD": 2.5,
+   "adaptUSD": "one-off budget exception",
+   "status": "adapt first ('make it our own'), then reuse"
+  },
+  {
+   "id": "opuscar:dark-documentary",
+   "name": "Radar Sweep Documentary",
+   "category": "Opuscar: Instruments & Evidence",
+   "uses": [
+    "History of science and engineering",
+    "Archaeology, sites and reconstructions",
+    "Astronomy, deep space and survey"
+   ],
+   "film": "Catching the Moon",
+   "line": "A storm at Parkes, 21 July 1969: a 64-metre dish tipped to its limit holds on and catches the moonwalk for the world.",
+   "poster": "https://github.com/lemomo-ai/lemo-opuscar/raw/main/styles/dark-documentary/poster.jpg",
+   "gallery": "https://lemomo-ai.github.io/lemo-opuscar/styles/dark-documentary/",
+   "demoSec": 52.0,
+   "aspect": "16:9 (adapt to 9:16)",
+   "needsImageGen": false,
+   "recommended": false,
+   "estUSD": 2.5,
+   "adaptUSD": "one-off budget exception",
+   "status": "adapt first ('make it our own'), then reuse"
+  },
+  {
+   "id": "opuscar:dark-keynote",
+   "name": "Dark Tech Keynote",
+   "category": "Opuscar: Screens & Interfaces",
+   "uses": [
+    "Product launches",
+    "SaaS",
+    "Keynotes"
+   ],
+   "film": "Room to Think",
+   "line": "Launch film for Tidy, a fictional app: one buried cursor snaps hundreds of windows back into place.",
+   "poster": "https://github.com/lemomo-ai/lemo-opuscar/raw/main/styles/dark-keynote/poster.jpg",
+   "gallery": "https://lemomo-ai.github.io/lemo-opuscar/styles/dark-keynote/",
+   "demoSec": 42.0,
+   "aspect": "16:9 (adapt to 9:16)",
+   "needsImageGen": false,
+   "recommended": false,
+   "estUSD": 2.5,
+   "adaptUSD": "one-off budget exception",
+   "status": "adapt first ('make it our own'), then reuse"
+  },
+  {
+   "id": "opuscar:data-physical",
+   "name": "Data Physicalization",
+   "category": "Opuscar: Data & Maps",
+   "uses": [
+    "Annual reports",
+    "Investor decks",
+    "Energy data"
+   ],
+   "film": "Two Spirals",
+   "line": "Twelve years of wind and solar stacked as real plates, spiralling round a walnut dial until solar overtakes.",
+   "poster": "https://github.com/lemomo-ai/lemo-opuscar/raw/main/styles/data-physical/poster.jpg",
+   "gallery": "https://lemomo-ai.github.io/lemo-opuscar/styles/data-physical/",
+   "demoSec": 39.4,
+   "aspect": "16:9 (adapt to 9:16)",
+   "needsImageGen": false,
+   "recommended": false,
+   "estUSD": 2.5,
+   "adaptUSD": "one-off budget exception",
+   "status": "adapt first ('make it our own'), then reuse"
+  },
+  {
+   "id": "opuscar:dataviz",
+   "name": "Data Storytelling",
+   "category": "Opuscar: Data & Maps",
+   "uses": [
+    "Data journalism",
+    "Reports",
+    "Climate & science"
+   ],
+   "film": "A Hundred Summers",
+   "line": "A hundred years of summer temperatures, where the chart itself tells the story.",
+   "poster": "https://github.com/lemomo-ai/lemo-opuscar/raw/main/styles/dataviz/poster.jpg",
+   "gallery": "https://lemomo-ai.github.io/lemo-opuscar/styles/dataviz/",
+   "demoSec": 50.0,
+   "aspect": "16:9 (adapt to 9:16)",
+   "needsImageGen": false,
+   "recommended": true,
+   "estUSD": 2.5,
+   "adaptUSD": "one-off budget exception",
+   "status": "adapt first ('make it our own'), then reuse"
+  },
+  {
+   "id": "opuscar:desktop-flythrough",
+   "name": "Tabletop App Flythrough",
+   "category": "Opuscar: Screens & Interfaces",
+   "uses": [
+    "App explainers",
+    "Workflows",
+    "Products"
+   ],
+   "film": "Before the Ding",
+   "line": "A cat photo hops across app cards on a sunlit desk, from one phone to a friend's.",
+   "poster": "https://github.com/lemomo-ai/lemo-opuscar/raw/main/styles/desktop-flythrough/poster.jpg",
+   "gallery": "https://lemomo-ai.github.io/lemo-opuscar/styles/desktop-flythrough/",
+   "demoSec": 60.0,
+   "aspect": "16:9 (adapt to 9:16)",
+   "needsImageGen": false,
+   "recommended": false,
+   "estUSD": 2.5,
+   "adaptUSD": "one-off budget exception",
+   "status": "adapt first ('make it our own'), then reuse"
+  },
+  {
+   "id": "opuscar:double-exposure",
+   "name": "Double Exposure",
+   "category": "Opuscar: Film & Tape",
+   "uses": [
+    "Brand and city films",
+    "Documentary and series openings",
+    "Music video intros"
+   ],
+   "film": "Mountains and Seas",
+   "line": "From the mountains to the sea as night falls: a stag, a wolf, an eagle, a salmon and a whale, each carrying its own place inside its silhouette, until the whale's harbour lands on the real shore.",
+   "poster": "https://github.com/lemomo-ai/lemo-opuscar/raw/main/styles/double-exposure/poster.jpg",
+   "gallery": "https://lemomo-ai.github.io/lemo-opuscar/styles/double-exposure/",
+   "demoSec": 50.5,
+   "aspect": "16:9 (adapt to 9:16)",
+   "needsImageGen": false,
+   "recommended": false,
+   "estUSD": 2.5,
+   "adaptUSD": "one-off budget exception",
+   "status": "adapt first ('make it our own'), then reuse"
+  },
+  {
+   "id": "opuscar:engraving",
+   "name": "Copperplate Engraving",
+   "category": "Opuscar: Print & Printmaking",
+   "uses": [
+    "Museum labels",
+    "Science explainers",
+    "Brand heritage"
+   ],
+   "film": "The Honeybee, Plate VII",
+   "line": "A natural-history plate engraves itself: the burin cuts the copper, the bee builds up line by line, and a watercolour wash brings it to life.",
+   "poster": "https://github.com/lemomo-ai/lemo-opuscar/raw/main/styles/engraving/poster.jpg",
+   "gallery": "https://lemomo-ai.github.io/lemo-opuscar/styles/engraving/",
+   "demoSec": 40.0,
+   "aspect": "16:9 (adapt to 9:16)",
+   "needsImageGen": false,
+   "recommended": false,
+   "estUSD": 2.5,
+   "adaptUSD": "one-off budget exception",
+   "status": "adapt first ('make it our own'), then reuse"
+  },
+  {
+   "id": "opuscar:firefly-pointillism",
+   "name": "Firefly Pointillism",
+   "category": "Opuscar: Light & Lines",
+   "uses": [
+    "Picture-book stories",
+    "Many becoming one",
+    "Night and nature lyric"
+   ],
+   "film": "Shine Back",
+   "line": "A firefly's blink is a question: a girl gets her answer as a deer, loses every light in a storm, and asks the whole dark with the last one.",
+   "poster": "https://github.com/lemomo-ai/lemo-opuscar/raw/main/styles/firefly-pointillism/poster.jpg",
+   "gallery": "https://lemomo-ai.github.io/lemo-opuscar/styles/firefly-pointillism/",
+   "demoSec": 50.6,
+   "aspect": "16:9 (adapt to 9:16)",
+   "needsImageGen": false,
+   "recommended": false,
+   "estUSD": 2.5,
+   "adaptUSD": "one-off budget exception",
+   "status": "adapt first ('make it our own'), then reuse"
+  },
+  {
+   "id": "opuscar:flat-space-explainer",
+   "name": "Scale Zoom Explainer",
+   "category": "Opuscar: Graphic & Type",
+   "uses": [
+    "Science explainers",
+    "Scale and size",
+    "Classroom"
+   ],
+   "film": "The Long Way Down",
+   "line": "A little probe whose eye is a zoom lens fires a dotted sight line at each next stop and takes us from the Milky Way down to a virus.",
+   "poster": "https://github.com/lemomo-ai/lemo-opuscar/raw/main/styles/flat-space-explainer/poster.jpg",
+   "gallery": "https://lemomo-ai.github.io/lemo-opuscar/styles/flat-space-explainer/",
+   "demoSec": 52.0,
+   "aspect": "16:9 (adapt to 9:16)",
+   "needsImageGen": false,
+   "recommended": false,
+   "estUSD": 2.5,
+   "adaptUSD": "one-off budget exception",
+   "status": "adapt first ('make it our own'), then reuse"
+  },
+  {
+   "id": "opuscar:flow-field",
+   "name": "Flow-field Wind Lines",
+   "category": "Opuscar: Light & Lines",
+   "uses": [
+    "Storms, monsoons and other weather",
+    "Ocean currents and river floods",
+    "Any flow measured against a threshold"
+   ],
+   "film": "Typhoon Yagi over Qiongzhou",
+   "line": "Thousands of ink wind lines, computed from the best track, draw Super Typhoon Yagi: the eye opening over the South China Sea, the landfall on Hainan, the spiral coming apart in Vietnam, and a whole week folded into one last line.",
+   "poster": "https://github.com/lemomo-ai/lemo-opuscar/raw/main/styles/flow-field/poster.jpg",
+   "gallery": "https://lemomo-ai.github.io/lemo-opuscar/styles/flow-field/",
+   "demoSec": 52.0,
+   "aspect": "16:9 (adapt to 9:16)",
+   "needsImageGen": false,
+   "recommended": true,
+   "estUSD": 2.5,
+   "adaptUSD": "one-off budget exception",
+   "status": "adapt first ('make it our own'), then reuse"
+  },
+  {
+   "id": "opuscar:game-show",
+   "name": "Rhythm Game Show",
+   "category": "Opuscar: Games",
+   "uses": [
+    "Tech timelines",
+    "Year in review",
+    "Variety shows"
+   ],
+   "film": "Rhythm of AI, 1997 → 2026",
+   "line": "The history of AI as a rhythm game: models take the stage on the beat, and a report card closes the show.",
+   "poster": "https://github.com/lemomo-ai/lemo-opuscar/raw/main/styles/game-show/poster.jpg",
+   "gallery": "https://lemomo-ai.github.io/lemo-opuscar/styles/game-show/",
+   "demoSec": 148.8,
+   "aspect": "16:9 (adapt to 9:16)",
+   "needsImageGen": false,
+   "recommended": false,
+   "estUSD": 2.5,
+   "adaptUSD": "one-off budget exception",
+   "status": "adapt first ('make it our own'), then reuse"
+  },
+  {
+   "id": "opuscar:gilded-illumination",
+   "name": "Gilded Illumination",
+   "category": "Opuscar: Traditional Crafts",
+   "uses": [
+    "Fables and picture-book stories",
+    "Holiday and festival shorts",
+    "Brand and origin stories"
+   ],
+   "film": "Borrowed Light",
+   "line": "In a painted world where only gold shines, the sun goes out; a girl carries the last lamp up the mountain and gives it its light back.",
+   "poster": "https://github.com/lemomo-ai/lemo-opuscar/raw/main/styles/gilded-illumination/poster.jpg",
+   "gallery": "https://lemomo-ai.github.io/lemo-opuscar/styles/gilded-illumination/",
+   "demoSec": 46.8,
+   "aspect": "16:9 (adapt to 9:16)",
+   "needsImageGen": false,
+   "recommended": false,
+   "estUSD": 2.5,
+   "adaptUSD": "one-off budget exception",
+   "status": "adapt first ('make it our own'), then reuse"
+  },
+  {
+   "id": "opuscar:glass-product",
+   "name": "Glass Product Render",
+   "category": "Opuscar: 3D & Miniature",
+   "uses": [
+    "Product launches",
+    "Consumer tech",
+    "Beauty"
+   ],
+   "film": "Aura — Hear the Light",
+   "line": "Unboxing and close-ups of Aura, fictional glass earbuds, in strip-light sweeps and caustics.",
+   "poster": "https://github.com/lemomo-ai/lemo-opuscar/raw/main/styles/glass-product/poster.jpg",
+   "gallery": "https://lemomo-ai.github.io/lemo-opuscar/styles/glass-product/",
+   "demoSec": 32.0,
+   "aspect": "16:9 (adapt to 9:16)",
+   "needsImageGen": false,
+   "recommended": false,
+   "estUSD": 2.5,
+   "adaptUSD": "one-off budget exception",
+   "status": "adapt first ('make it our own'), then reuse"
+  },
+  {
+   "id": "opuscar:halftone-dossier",
+   "name": "Halftone Dossier",
+   "category": "Opuscar: Print & Printmaking",
+   "uses": [
+    "Humour",
+    "Pet content",
+    "Social shorts"
+   ],
+   "film": "Case File: Chubby",
+   "line": "A chubby orange cat stands trial for testing gravity and 4 a.m. parkour, and walks free.",
+   "poster": "https://github.com/lemomo-ai/lemo-opuscar/raw/main/styles/halftone-dossier/poster.jpg",
+   "gallery": "https://lemomo-ai.github.io/lemo-opuscar/styles/halftone-dossier/",
+   "demoSec": 30.0,
+   "aspect": "16:9 (adapt to 9:16)",
+   "needsImageGen": false,
+   "recommended": false,
+   "estUSD": 2.5,
+   "adaptUSD": "one-off budget exception",
+   "status": "adapt first ('make it our own'), then reuse"
+  },
+  {
+   "id": "opuscar:hardcore-info",
+   "name": "Line-Art Cutaway",
+   "category": "Opuscar: Line Diagrams",
+   "uses": [
+    "Hardware explainers",
+    "Product engineering",
+    "Science education"
+   ],
+   "film": "Where Is Your Phone's Antenna?",
+   "line": "A phone loses signal when held by the corner; taken apart, its metal frame turns out to be the antenna, cut into pieces your hand can bridge.",
+   "poster": "https://github.com/lemomo-ai/lemo-opuscar/raw/main/styles/hardcore-info/poster.jpg",
+   "gallery": "https://lemomo-ai.github.io/lemo-opuscar/styles/hardcore-info/",
+   "demoSec": 52.0,
+   "aspect": "16:9 (adapt to 9:16)",
+   "needsImageGen": false,
+   "recommended": true,
+   "estUSD": 2.5,
+   "adaptUSD": "one-off budget exception",
+   "status": "adapt first ('make it our own'), then reuse"
+  },
+  {
+   "id": "opuscar:hd-2d",
+   "name": "2.5D Pixel Art",
+   "category": "Opuscar: Games",
+   "uses": [
+    "Game trailers",
+    "Fantasy",
+    "Story films"
+   ],
+   "film": "The Lampbearer",
+   "line": "The lighthouse goes dark; a girl carries the last flame through a night forest and up the storm cliffs.",
+   "poster": "https://github.com/lemomo-ai/lemo-opuscar/raw/main/styles/hd-2d/poster.jpg",
+   "gallery": "https://lemomo-ai.github.io/lemo-opuscar/styles/hd-2d/",
+   "demoSec": 76.5,
+   "aspect": "16:9 (adapt to 9:16)",
+   "needsImageGen": false,
+   "recommended": false,
+   "estUSD": 2.5,
+   "adaptUSD": "one-off budget exception",
+   "status": "adapt first ('make it our own'), then reuse"
+  },
+  {
+   "id": "opuscar:hologram-hud",
+   "name": "Sci-fi Hologram HUD",
+   "category": "Opuscar: Screens & Interfaces",
+   "uses": [
+    "Spec walkthroughs",
+    "Launch videos",
+    "Trade shows"
+   ],
+   "film": "Volt · Spec Scan",
+   "line": "An e-bike is scanned into a hologram; target boxes lock onto the battery, motor and brakes.",
+   "poster": "https://github.com/lemomo-ai/lemo-opuscar/raw/main/styles/hologram-hud/poster.jpg",
+   "gallery": "https://lemomo-ai.github.io/lemo-opuscar/styles/hologram-hud/",
+   "demoSec": 39.0,
+   "aspect": "16:9 (adapt to 9:16)",
+   "needsImageGen": false,
+   "recommended": false,
+   "estUSD": 2.5,
+   "adaptUSD": "one-off budget exception",
+   "status": "adapt first ('make it our own'), then reuse"
+  },
+  {
+   "id": "opuscar:impasto",
+   "name": "Impasto Oil Painting",
+   "category": "Opuscar: Painting & Illustration",
+   "uses": [
+    "Music videos",
+    "Art & culture",
+    "Emotional ads"
+   ],
+   "film": "The Colour of Rain",
+   "line": "In a grey, rainy square one red umbrella opens, and a waltz paints the whole plaza in colour.",
+   "poster": "https://github.com/lemomo-ai/lemo-opuscar/raw/main/styles/impasto/poster.jpg",
+   "gallery": "https://lemomo-ai.github.io/lemo-opuscar/styles/impasto/",
+   "demoSec": 39.7,
+   "aspect": "16:9 (adapt to 9:16)",
+   "needsImageGen": false,
+   "recommended": false,
+   "estUSD": 2.5,
+   "adaptUSD": "one-off budget exception",
+   "status": "adapt first ('make it our own'), then reuse"
+  },
+  {
+   "id": "opuscar:ink-wash",
+   "name": "Chinese Ink Wash",
+   "category": "Opuscar: Traditional Crafts",
+   "uses": [
+    "Wuxia",
+    "Cultural brands",
+    "Poetry"
+   ],
+   "film": "The Swordsman and the River",
+   "line": "A swordsman crosses the river on the water and splits the current with a single stroke.",
+   "poster": "https://github.com/lemomo-ai/lemo-opuscar/raw/main/styles/ink-wash/poster.jpg",
+   "gallery": "https://lemomo-ai.github.io/lemo-opuscar/styles/ink-wash/",
+   "demoSec": 48.0,
+   "aspect": "16:9 (adapt to 9:16)",
+   "needsImageGen": false,
+   "recommended": false,
+   "estUSD": 2.5,
+   "adaptUSD": "one-off budget exception",
+   "status": "adapt first ('make it our own'), then reuse"
+  },
+  {
+   "id": "opuscar:instruction-manual",
+   "name": "Instruction Manual Art",
+   "category": "Opuscar: Line Diagrams",
+   "uses": [
+    "Assembly and set-up guides",
+    "Safety instructions",
+    "Product onboarding"
+   ],
+   "film": "Step Ten",
+   "line": "Two first-timers build a crib from a flat-pack manual, ten steps on one 45° page; step ten was never in the manual.",
+   "poster": "https://github.com/lemomo-ai/lemo-opuscar/raw/main/styles/instruction-manual/poster.jpg",
+   "gallery": "https://lemomo-ai.github.io/lemo-opuscar/styles/instruction-manual/",
+   "demoSec": 50.6,
+   "aspect": "16:9 (adapt to 9:16)",
+   "needsImageGen": false,
+   "recommended": true,
+   "estUSD": 2.5,
+   "adaptUSD": "one-off budget exception",
+   "status": "adapt first ('make it our own'), then reuse"
+  },
+  {
+   "id": "opuscar:ipad-sketch",
+   "name": "Tablet Sketch Explainer",
+   "category": "Opuscar: Sketch & Board",
+   "uses": [
+    "Food & drink explainers",
+    "Craft and how-to",
+    "Lifestyle science"
+   ],
+   "film": "From Cherry to Cup",
+   "line": "The coffee in your cup turns into a red cherry, then walks back to the cup: ripening, drying, roasting and grinding, one colour change at a time on a single pencil page.",
+   "poster": "https://github.com/lemomo-ai/lemo-opuscar/raw/main/styles/ipad-sketch/poster.jpg",
+   "gallery": "https://lemomo-ai.github.io/lemo-opuscar/styles/ipad-sketch/",
+   "demoSec": 51.0,
+   "aspect": "16:9 (adapt to 9:16)",
+   "needsImageGen": false,
+   "recommended": false,
+   "estUSD": 2.5,
+   "adaptUSD": "one-off budget exception",
+   "status": "adapt first ('make it our own'), then reuse"
+  },
+  {
+   "id": "opuscar:iso-infographic",
+   "name": "Isometric Infographic",
+   "category": "Opuscar: Line Diagrams",
+   "uses": [
+    "Process explainers",
+    "Supply chains",
+    "Annual reports"
+   ],
+   "film": "From Bean to Cup",
+   "line": "A coffee's journey from the plantation to your hands, across one isometric world.",
+   "poster": "https://github.com/lemomo-ai/lemo-opuscar/raw/main/styles/iso-infographic/poster.jpg",
+   "gallery": "https://lemomo-ai.github.io/lemo-opuscar/styles/iso-infographic/",
+   "demoSec": 58.8,
+   "aspect": "16:9 (adapt to 9:16)",
+   "needsImageGen": false,
+   "recommended": true,
+   "estUSD": 2.5,
+   "adaptUSD": "one-off budget exception",
+   "status": "adapt first ('make it our own'), then reuse"
+  },
+  {
+   "id": "opuscar:isometric-picture-book",
+   "name": "Isometric People Scene",
+   "category": "Opuscar: 3D & Miniature",
+   "uses": [
+    "Everyday rules",
+    "Queues",
+    "Comparisons"
+   ],
+   "film": "Seventy-Two Seats",
+   "line": "Travellers board an isometric plane, and the order shows why one way is nearly twice as fast.",
+   "poster": "https://github.com/lemomo-ai/lemo-opuscar/raw/main/styles/isometric-picture-book/poster.jpg",
+   "gallery": "https://lemomo-ai.github.io/lemo-opuscar/styles/isometric-picture-book/",
+   "demoSec": 59.8,
+   "aspect": "16:9 (adapt to 9:16)",
+   "needsImageGen": false,
+   "recommended": false,
+   "estUSD": 2.5,
+   "adaptUSD": "one-off budget exception",
+   "status": "adapt first ('make it our own'), then reuse"
+  },
+  {
+   "id": "opuscar:kino-montage",
+   "name": "Constructivist Montage",
+   "category": "Opuscar: Edit & Documentary",
+   "uses": [
+    "Industry histories",
+    "Milestones",
+    "Collective effort"
+   ],
+   "film": "410 Days",
+   "line": "The Empire State's 1931 brochure credits its builders; the site film and Hine's photos answer: 2,500 a day.",
+   "poster": "https://github.com/lemomo-ai/lemo-opuscar/raw/main/styles/kino-montage/poster.jpg",
+   "gallery": "https://lemomo-ai.github.io/lemo-opuscar/styles/kino-montage/",
+   "demoSec": 60.0,
+   "aspect": "16:9 (adapt to 9:16)",
+   "needsImageGen": false,
+   "recommended": false,
+   "estUSD": 2.5,
+   "adaptUSD": "one-off budget exception",
+   "status": "adapt first ('make it our own'), then reuse"
+  },
+  {
+   "id": "opuscar:lidar-survey",
+   "name": "LiDAR Survey",
+   "category": "Opuscar: Instruments & Evidence",
+   "uses": [
+    "Heritage",
+    "Environment",
+    "Site surveys"
+   ],
+   "film": "The Fields Under the Forest",
+   "line": "A laser survey strips the canopy off a Connecticut forest and finds 3.4 km of old farm walls.",
+   "poster": "https://github.com/lemomo-ai/lemo-opuscar/raw/main/styles/lidar-survey/poster.jpg",
+   "gallery": "https://lemomo-ai.github.io/lemo-opuscar/styles/lidar-survey/",
+   "demoSec": 40.0,
+   "aspect": "16:9 (adapt to 9:16)",
+   "needsImageGen": false,
+   "recommended": true,
+   "estUSD": 2.5,
+   "adaptUSD": "one-off budget exception",
+   "status": "adapt first ('make it our own'), then reuse"
+  },
+  {
+   "id": "opuscar:living-screencast",
+   "name": "Mascot Screencast",
+   "category": "Opuscar: Screens & Interfaces",
+   "uses": [
+    "Product tutorials",
+    "Feature launches",
+    "Onboarding"
+   ],
+   "film": "Clawd Moves In",
+   "line": "Clawd hops out of the terminal into the Claude app and acts out plan mode and self-checks in one take.",
+   "poster": "https://github.com/lemomo-ai/lemo-opuscar/raw/main/styles/living-screencast/poster.jpg",
+   "gallery": "https://lemomo-ai.github.io/lemo-opuscar/styles/living-screencast/",
+   "demoSec": 59.4,
+   "aspect": "16:9 (adapt to 9:16)",
+   "needsImageGen": false,
+   "recommended": false,
+   "estUSD": 2.5,
+   "adaptUSD": "one-off budget exception",
+   "status": "adapt first ('make it our own'), then reuse"
+  },
+  {
+   "id": "opuscar:lowpoly-island",
+   "name": "Low-poly Isometric Island",
+   "category": "Opuscar: 3D & Miniature",
+   "uses": [
+    "Game trailers",
+    "World building",
+    "Calm content"
+   ],
+   "film": "The Island That Grew",
+   "line": "An island and its village grow tile by tile from an empty sea, each tile a note, into a starry night.",
+   "poster": "https://github.com/lemomo-ai/lemo-opuscar/raw/main/styles/lowpoly-island/poster.jpg",
+   "gallery": "https://lemomo-ai.github.io/lemo-opuscar/styles/lowpoly-island/",
+   "demoSec": 53.0,
+   "aspect": "16:9 (adapt to 9:16)",
+   "needsImageGen": false,
+   "recommended": false,
+   "estUSD": 2.5,
+   "adaptUSD": "one-off budget exception",
+   "status": "adapt first ('make it our own'), then reuse"
+  },
+  {
+   "id": "opuscar:manga-panels",
+   "name": "Manga Panels",
+   "category": "Opuscar: Cartoons",
+   "uses": [
+    "Music videos",
+    "Product launches",
+    "Anime openings"
+   ],
+   "film": "KOMA ONE: Thirty Frames a Second",
+   "line": "A street photographer chases a running light to the moment the pigeons rise; her pocket camera splits that second into thirty panels.",
+   "poster": "https://github.com/lemomo-ai/lemo-opuscar/raw/main/styles/manga-panels/poster.jpg",
+   "gallery": "https://lemomo-ai.github.io/lemo-opuscar/styles/manga-panels/",
+   "demoSec": 48.0,
+   "aspect": "16:9 (adapt to 9:16)",
+   "needsImageGen": true,
+   "recommended": false,
+   "estUSD": 2.5,
+   "adaptUSD": "one-off budget exception",
+   "status": "adapt first ('make it our own'), then reuse"
+  },
+  {
+   "id": "opuscar:map-explainer",
+   "name": "3D Map Explainer",
+   "category": "Opuscar: Data & Maps",
+   "uses": [
+    "News and geopolitics",
+    "Energy, trade and shipping",
+    "Rivers, borders and terrain"
+   ],
+   "film": "Strait of Hormuz",
+   "line": "From the globe down into the strait a fifth of the world's oil squeezes through: two lanes, a cut through the sea floor, and pipelines that can carry only a fraction of it around.",
+   "poster": "https://github.com/lemomo-ai/lemo-opuscar/raw/main/styles/map-explainer/poster.jpg",
+   "gallery": "https://lemomo-ai.github.io/lemo-opuscar/styles/map-explainer/",
+   "demoSec": 52.0,
+   "aspect": "16:9 (adapt to 9:16)",
+   "needsImageGen": false,
+   "recommended": true,
+   "estUSD": 2.5,
+   "adaptUSD": "one-off budget exception",
+   "status": "adapt first ('make it our own'), then reuse"
+  },
+  {
+   "id": "opuscar:marker-paper",
+   "name": "Marker on Paper",
+   "category": "Opuscar: Sketch & Board",
+   "uses": [
+    "Worked problems",
+    "Science explainers",
+    "Lessons"
+   ],
+   "film": "How Far Can You See?",
+   "line": "A felt-tip marker works out how far the horizon is from a beach, then shows that climbing a hundred times higher only lets you see ten times farther.",
+   "poster": "https://github.com/lemomo-ai/lemo-opuscar/raw/main/styles/marker-paper/poster.jpg",
+   "gallery": "https://lemomo-ai.github.io/lemo-opuscar/styles/marker-paper/",
+   "demoSec": 52.0,
+   "aspect": "16:9 (adapt to 9:16)",
+   "needsImageGen": false,
+   "recommended": false,
+   "estUSD": 2.5,
+   "adaptUSD": "one-off budget exception",
+   "status": "adapt first ('make it our own'), then reuse"
+  },
+  {
+   "id": "opuscar:memphis-diorama",
+   "name": "Memphis Diorama",
+   "category": "Opuscar: 3D & Miniature",
+   "uses": [
+    "Web heroes",
+    "Ambient loops",
+    "Seasons"
+   ],
+   "film": "Four Seasons in Pomelo Town",
+   "line": "One river bend, four seasons, one take; each turns when the big tree squats and springs back.",
+   "poster": "https://github.com/lemomo-ai/lemo-opuscar/raw/main/styles/memphis-diorama/poster.jpg",
+   "gallery": "https://lemomo-ai.github.io/lemo-opuscar/styles/memphis-diorama/",
+   "demoSec": 45.0,
+   "aspect": "16:9 (adapt to 9:16)",
+   "needsImageGen": false,
+   "recommended": false,
+   "estUSD": 2.5,
+   "adaptUSD": "one-off budget exception",
+   "status": "adapt first ('make it our own'), then reuse"
+  },
+  {
+   "id": "opuscar:microgame",
+   "name": "Microgame Frenzy",
+   "category": "Opuscar: Games",
+   "uses": [
+    "Game trailers",
+    "Onboarding",
+    "Social shorts"
+   ],
+   "film": "Five-Second Astronaut",
+   "line": "A clumsy cadet survives a five-second boot camp, faster and faster, until the boss: landing home.",
+   "poster": "https://github.com/lemomo-ai/lemo-opuscar/raw/main/styles/microgame/poster.jpg",
+   "gallery": "https://lemomo-ai.github.io/lemo-opuscar/styles/microgame/",
+   "demoSec": 59.8,
+   "aspect": "16:9 (adapt to 9:16)",
+   "needsImageGen": false,
+   "recommended": false,
+   "estUSD": 2.5,
+   "adaptUSD": "one-off budget exception",
+   "status": "adapt first ('make it our own'), then reuse"
+  },
+  {
+   "id": "opuscar:microscope",
+   "name": "Under the Microscope",
+   "category": "Opuscar: Instruments & Evidence",
+   "uses": [
+    "Biomedicine",
+    "Materials science",
+    "Skincare science"
+   ],
+   "film": "Measured Blue",
+   "line": "One continuous move from a liver slide to a single nucleus; two circles, counted pixel by pixel, differ 2.4 times in blue.",
+   "poster": "https://github.com/lemomo-ai/lemo-opuscar/raw/main/styles/microscope/poster.jpg",
+   "gallery": "https://lemomo-ai.github.io/lemo-opuscar/styles/microscope/",
+   "demoSec": 39.5,
+   "aspect": "16:9 (adapt to 9:16)",
+   "needsImageGen": false,
+   "recommended": false,
+   "estUSD": 2.5,
+   "adaptUSD": "one-off budget exception",
+   "status": "adapt first ('make it our own'), then reuse"
+  },
+  {
+   "id": "opuscar:midcentury-toon",
+   "name": "Mid-century Cartoon",
+   "category": "Opuscar: Cartoons",
+   "uses": [
+    "Set-up guides",
+    "Help centres",
+    "How-to"
+   ],
+   "film": "Meet Pip",
+   "line": "A robot vacuum set up in three steps, told like a 1950s classroom film.",
+   "poster": "https://github.com/lemomo-ai/lemo-opuscar/raw/main/styles/midcentury-toon/poster.jpg",
+   "gallery": "https://lemomo-ai.github.io/lemo-opuscar/styles/midcentury-toon/",
+   "demoSec": 40.0,
+   "aspect": "16:9 (adapt to 9:16)",
+   "needsImageGen": false,
+   "recommended": false,
+   "estUSD": 2.5,
+   "adaptUSD": "one-off budget exception",
+   "status": "adapt first ('make it our own'), then reuse"
+  },
+  {
+   "id": "opuscar:neon-tubes",
+   "name": "Neon Tubes",
+   "category": "Opuscar: Light & Lines",
+   "uses": [
+    "Shop openings and mascot stories",
+    "Nightlife and city-pop music videos",
+    "City and festival night idents"
+   ],
+   "film": "Midnight Snack",
+   "line": "A neon cat goes out for the goldfish on the sign at the end of the street, cracks its bowl, and runs the fading fish home through the rain to the goblet on its own sign.",
+   "poster": "https://github.com/lemomo-ai/lemo-opuscar/raw/main/styles/neon-tubes/poster.jpg",
+   "gallery": "https://lemomo-ai.github.io/lemo-opuscar/styles/neon-tubes/",
+   "demoSec": 48.0,
+   "aspect": "16:9 (adapt to 9:16)",
+   "needsImageGen": false,
+   "recommended": false,
+   "estUSD": 2.5,
+   "adaptUSD": "one-off budget exception",
+   "status": "adapt first ('make it our own'), then reuse"
+  },
+  {
+   "id": "opuscar:news-package",
+   "name": "Broadcast News Package",
+   "category": "Opuscar: Edit & Documentary",
+   "uses": [
+    "News round-ups",
+    "Bulletins",
+    "Market updates"
+   ],
+   "film": "The Week in AI",
+   "line": "Four AI stories from one week in a full on-air package: rundown, headline strap, price board, spec card.",
+   "poster": "https://github.com/lemomo-ai/lemo-opuscar/raw/main/styles/news-package/poster.jpg",
+   "gallery": "https://lemomo-ai.github.io/lemo-opuscar/styles/news-package/",
+   "demoSec": 53.5,
+   "aspect": "16:9 (adapt to 9:16)",
+   "needsImageGen": false,
+   "recommended": false,
+   "estUSD": 2.5,
+   "adaptUSD": "one-off budget exception",
+   "status": "adapt first ('make it our own'), then reuse"
+  },
+  {
+   "id": "opuscar:newsreel",
+   "name": "1920s Newsreel",
+   "category": "Opuscar: Edit & Documentary",
+   "uses": [
+    "History stories",
+    "Fads & eras",
+    "Anniversaries"
+   ],
+   "film": "Knock-Knee Alert",
+   "line": "1926: the papers say the Charleston will ruin America's knees; at Ford's own picnic the kids dance it anyway.",
+   "poster": "https://github.com/lemomo-ai/lemo-opuscar/raw/main/styles/newsreel/poster.jpg",
+   "gallery": "https://lemomo-ai.github.io/lemo-opuscar/styles/newsreel/",
+   "demoSec": 54.6,
+   "aspect": "16:9 (adapt to 9:16)",
+   "needsImageGen": false,
+   "recommended": false,
+   "estUSD": 2.5,
+   "adaptUSD": "one-off budget exception",
+   "status": "adapt first ('make it our own'), then reuse"
+  },
+  {
+   "id": "opuscar:one-bit-dither",
+   "name": "1-bit Dither",
+   "category": "Opuscar: Screens & Interfaces",
+   "uses": [
+    "History told through a chain of media",
+    "Printing, scanning and signals",
+    "Night scenes and space"
+   ],
+   "film": "The Moon's Fax",
+   "line": "February 1966: the first close-up of the Moon arrives at an English radio telescope as a newspaper fax, printed one line at a time in two inks, a day early and stretched too tall.",
+   "poster": "https://github.com/lemomo-ai/lemo-opuscar/raw/main/styles/one-bit-dither/poster.jpg",
+   "gallery": "https://lemomo-ai.github.io/lemo-opuscar/styles/one-bit-dither/",
+   "demoSec": 50.0,
+   "aspect": "16:9 (adapt to 9:16)",
+   "needsImageGen": false,
+   "recommended": false,
+   "estUSD": 2.5,
+   "adaptUSD": "one-off budget exception",
+   "status": "adapt first ('make it our own'), then reuse"
+  },
+  {
+   "id": "opuscar:one-line",
+   "name": "One-line Drawing",
+   "category": "Opuscar: Sketch & Board",
+   "uses": [
+    "Brand stories",
+    "Life milestones",
+    "Minimal ads"
+   ],
+   "film": "The Line That Never Lifted",
+   "line": "One unbroken line draws a whole life, then the pen passes to a child.",
+   "poster": "https://github.com/lemomo-ai/lemo-opuscar/raw/main/styles/one-line/poster.jpg",
+   "gallery": "https://lemomo-ai.github.io/lemo-opuscar/styles/one-line/",
+   "demoSec": 47.5,
+   "aspect": "16:9 (adapt to 9:16)",
+   "needsImageGen": false,
+   "recommended": false,
+   "estUSD": 2.5,
+   "adaptUSD": "one-off budget exception",
+   "status": "adapt first ('make it our own'), then reuse"
+  },
+  {
+   "id": "opuscar:oscilloscope-math",
+   "name": "Oscilloscope Math",
+   "category": "Opuscar: Light & Lines",
+   "uses": [
+    "Maths and physics lessons",
+    "Signals and electronics",
+    "Science explainers"
+   ],
+   "film": "The Gibbs Phenomenon",
+   "line": "How do you roll a square out of circles? Spinning circles stack into a square wave, until a dive into one corner finds the 9% spike that never goes away.",
+   "poster": "https://github.com/lemomo-ai/lemo-opuscar/raw/main/styles/oscilloscope-math/poster.jpg",
+   "gallery": "https://lemomo-ai.github.io/lemo-opuscar/styles/oscilloscope-math/",
+   "demoSec": 51.1,
+   "aspect": "16:9 (adapt to 9:16)",
+   "needsImageGen": false,
+   "recommended": false,
+   "estUSD": 2.5,
+   "adaptUSD": "one-off budget exception",
+   "status": "adapt first ('make it our own'), then reuse"
+  },
+  {
+   "id": "opuscar:paper-lantern",
+   "name": "Paper-cut Lightbox",
+   "category": "Opuscar: Traditional Crafts",
+   "uses": [
+    "Journeys and travel",
+    "Farewells and anniversaries",
+    "Places and their stories"
+   ],
+   "film": "The Last Night Train",
+   "line": "An old night train makes its last run, from a snowy mountain halt through a long tunnel to the sea, its lit windows going out one by one at the end of the line.",
+   "poster": "https://github.com/lemomo-ai/lemo-opuscar/raw/main/styles/paper-lantern/poster.jpg",
+   "gallery": "https://lemomo-ai.github.io/lemo-opuscar/styles/paper-lantern/",
+   "demoSec": 51.0,
+   "aspect": "16:9 (adapt to 9:16)",
+   "needsImageGen": false,
+   "recommended": false,
+   "estUSD": 2.5,
+   "adaptUSD": "one-off budget exception",
+   "status": "adapt first ('make it our own'), then reuse"
+  },
+  {
+   "id": "opuscar:paper-popup",
+   "name": "Paper Pop-up Book",
+   "category": "Opuscar: 3D & Miniature",
+   "uses": [
+    "Children's books",
+    "Game trailers",
+    "Story films"
+   ],
+   "film": "Pip's Paper Adventure",
+   "line": "A pop-up book opens on a desk; a sprite named Pip adventures through paper worlds and jumps out into ours.",
+   "poster": "https://github.com/lemomo-ai/lemo-opuscar/raw/main/styles/paper-popup/poster.jpg",
+   "gallery": "https://lemomo-ai.github.io/lemo-opuscar/styles/paper-popup/",
+   "demoSec": 133.0,
+   "aspect": "16:9 (adapt to 9:16)",
+   "needsImageGen": false,
+   "recommended": false,
+   "estUSD": 2.5,
+   "adaptUSD": "one-off budget exception",
+   "status": "adapt first ('make it our own'), then reuse"
+  },
+  {
+   "id": "opuscar:papercut-red",
+   "name": "Red Paper-cut",
+   "category": "Opuscar: Traditional Crafts",
+   "uses": [
+    "Lunar New Year",
+    "Festive greetings",
+    "Folk tales"
+   ],
+   "film": "Nian Comes to Town",
+   "line": "On New Year's Eve the beast Nian comes to town, and one girl's giant paper-cut lights up the village to scare it off.",
+   "poster": "https://github.com/lemomo-ai/lemo-opuscar/raw/main/styles/papercut-red/poster.jpg",
+   "gallery": "https://lemomo-ai.github.io/lemo-opuscar/styles/papercut-red/",
+   "demoSec": 49.0,
+   "aspect": "16:9 (adapt to 9:16)",
+   "needsImageGen": false,
+   "recommended": false,
+   "estUSD": 2.5,
+   "adaptUSD": "one-off budget exception",
+   "status": "adapt first ('make it our own'), then reuse"
+  },
+  {
+   "id": "opuscar:pen-plotter",
+   "name": "Pen Plotter",
+   "category": "Opuscar: Line Diagrams",
+   "uses": [
+    "Maps and terrain",
+    "Measurements and records",
+    "Generative and data drawings"
+   ],
+   "film": "8848.86",
+   "line": "At night under a desk lamp, a pen plotter draws Mount Qomolangma from real elevation data with four pens, and writes its height last.",
+   "poster": "https://github.com/lemomo-ai/lemo-opuscar/raw/main/styles/pen-plotter/poster.jpg",
+   "gallery": "https://lemomo-ai.github.io/lemo-opuscar/styles/pen-plotter/",
+   "demoSec": 49.9,
+   "aspect": "16:9 (adapt to 9:16)",
+   "needsImageGen": false,
+   "recommended": false,
+   "estUSD": 2.5,
+   "adaptUSD": "one-off budget exception",
+   "status": "adapt first ('make it our own'), then reuse"
+  },
+  {
+   "id": "opuscar:pictogram-motion",
+   "name": "Pictogram Motion",
+   "category": "Opuscar: Graphic & Type",
+   "uses": [
+    "Public services and city stories",
+    "Brand and event identity films",
+    "Explainers told through signs and objects"
+   ],
+   "film": "Left Behind",
+   "line": "A yellow umbrella left on a bus waits out a sunny day on the lost-property shelf, then opens with 312 others when the storm comes back: objects, vehicles, weather and signs as beat-locked geometric pictograms.",
+   "poster": "https://github.com/lemomo-ai/lemo-opuscar/raw/main/styles/pictogram-motion/poster.jpg",
+   "gallery": "https://lemomo-ai.github.io/lemo-opuscar/styles/pictogram-motion/",
+   "demoSec": 50.0,
+   "aspect": "16:9 (adapt to 9:16)",
+   "needsImageGen": false,
+   "recommended": false,
+   "estUSD": 2.5,
+   "adaptUSD": "one-off budget exception",
+   "status": "adapt first ('make it our own'), then reuse"
+  },
+  {
+   "id": "opuscar:pip-simulation",
+   "name": "Blob Simulation",
+   "category": "Opuscar: Data & Maps",
+   "uses": [
+    "Evolution and natural selection",
+    "Game theory and agent-based models",
+    "Epidemics, queues and markets"
+   ],
+   "film": "Is Faster Better?",
+   "line": "160 flocked Pips race for beans: the fast ones eat first and run dry first, and after 20 generations the board turns blue.",
+   "poster": "https://github.com/lemomo-ai/lemo-opuscar/raw/main/styles/pip-simulation/poster.jpg",
+   "gallery": "https://lemomo-ai.github.io/lemo-opuscar/styles/pip-simulation/",
+   "demoSec": 52.0,
+   "aspect": "16:9 (adapt to 9:16)",
+   "needsImageGen": false,
+   "recommended": false,
+   "estUSD": 2.5,
+   "adaptUSD": "one-off budget exception",
+   "status": "adapt first ('make it our own'), then reuse"
+  },
+  {
+   "id": "opuscar:pixel-rpg",
+   "name": "16-bit Pixel RPG",
+   "category": "Opuscar: Games",
+   "uses": [
+    "Game trailers",
+    "Recaps",
+    "Nostalgia"
+   ],
+   "film": "The Last Save Point",
+   "line": "At the final boss door a hero saves the game, and the save screen replays the whole journey.",
+   "poster": "https://github.com/lemomo-ai/lemo-opuscar/raw/main/styles/pixel-rpg/poster.jpg",
+   "gallery": "https://lemomo-ai.github.io/lemo-opuscar/styles/pixel-rpg/",
+   "demoSec": 54.5,
+   "aspect": "16:9 (adapt to 9:16)",
+   "needsImageGen": false,
+   "recommended": false,
+   "estUSD": 2.5,
+   "adaptUSD": "one-off budget exception",
+   "status": "adapt first ('make it our own'), then reuse"
+  },
+  {
+   "id": "opuscar:pop-art",
+   "name": "Pop Art",
+   "category": "Opuscar: Print & Printmaking",
+   "uses": [
+    "Everyday-object explainers",
+    "Brand and product posters",
+    "Small data stories"
+   ],
+   "film": "The Same Banana",
+   "line": "Almost every banana in the shops is one plant, copied: a wall of identical prints, an old banana eaten black by dots, and a wave of colour that turns into many bananas.",
+   "poster": "https://github.com/lemomo-ai/lemo-opuscar/raw/main/styles/pop-art/poster.jpg",
+   "gallery": "https://lemomo-ai.github.io/lemo-opuscar/styles/pop-art/",
+   "demoSec": 52.0,
+   "aspect": "16:9 (adapt to 9:16)",
+   "needsImageGen": false,
+   "recommended": false,
+   "estUSD": 2.5,
+   "adaptUSD": "one-off budget exception",
+   "status": "adapt first ('make it our own'), then reuse"
+  },
+  {
+   "id": "opuscar:precise-mechanism",
+   "name": "Color-Coded Mechanism",
+   "category": "Opuscar: Line Diagrams",
+   "uses": [
+    "How machines work",
+    "Product and engineering explainers",
+    "Science teaching"
+   ],
+   "film": "Three Systems Keep the Time",
+   "line": "A watch with no battery is cut open: its three systems are dyed one by one, the train races when the escapement is pulled out, and one slowed tick lets it all out again.",
+   "poster": "https://github.com/lemomo-ai/lemo-opuscar/raw/main/styles/precise-mechanism/poster.jpg",
+   "gallery": "https://lemomo-ai.github.io/lemo-opuscar/styles/precise-mechanism/",
+   "demoSec": 52.0,
+   "aspect": "16:9 (adapt to 9:16)",
+   "needsImageGen": false,
+   "recommended": true,
+   "estUSD": 2.5,
+   "adaptUSD": "one-off budget exception",
+   "status": "adapt first ('make it our own'), then reuse"
+  },
+  {
+   "id": "opuscar:printed-long-take",
+   "name": "Scratchboard Long Take",
+   "category": "Opuscar: Print & Printmaking",
+   "uses": [
+    "Journeys",
+    "Wildlife",
+    "Landscapes"
+   ],
+   "film": "Thirty-Three Cranes",
+   "line": "Red-crowned cranes in a Hokkaido valley, one scratchboard take, counted back from 33 to 1,927.",
+   "poster": "https://github.com/lemomo-ai/lemo-opuscar/raw/main/styles/printed-long-take/poster.jpg",
+   "gallery": "https://lemomo-ai.github.io/lemo-opuscar/styles/printed-long-take/",
+   "demoSec": 60.0,
+   "aspect": "16:9 (adapt to 9:16)",
+   "needsImageGen": false,
+   "recommended": false,
+   "estUSD": 2.5,
+   "adaptUSD": "one-off budget exception",
+   "status": "adapt first ('make it our own'), then reuse"
+  },
+  {
+   "id": "opuscar:risograph",
+   "name": "Risograph Print",
+   "category": "Opuscar: Print & Printmaking",
+   "uses": [
+    "Indie brands",
+    "Zines",
+    "Lifestyle"
+   ],
+   "film": "Sunday Ride",
+   "line": "A Sunday-morning bike ride through the city — bakery, park, riverside — each stop adding an ink until three misregistered plates overprint.",
+   "poster": "https://github.com/lemomo-ai/lemo-opuscar/raw/main/styles/risograph/poster.jpg",
+   "gallery": "https://lemomo-ai.github.io/lemo-opuscar/styles/risograph/",
+   "demoSec": 40.0,
+   "aspect": "16:9 (adapt to 9:16)",
+   "needsImageGen": false,
+   "recommended": false,
+   "estUSD": 2.5,
+   "adaptUSD": "one-off budget exception",
+   "status": "adapt first ('make it our own'), then reuse"
+  },
+  {
+   "id": "opuscar:rubber-hose",
+   "name": "1930s Rubber Hose Cartoon",
+   "category": "Opuscar: Cartoons",
+   "uses": [
+    "Food & drink",
+    "Retro ads",
+    "Kids"
+   ],
+   "film": "Coffee Cup Chase",
+   "line": "A coffee cup chases a runaway sugar cube around the kitchen, 1930s-cartoon style.",
+   "poster": "https://github.com/lemomo-ai/lemo-opuscar/raw/main/styles/rubber-hose/poster.jpg",
+   "gallery": "https://lemomo-ai.github.io/lemo-opuscar/styles/rubber-hose/",
+   "demoSec": 50.0,
+   "aspect": "16:9 (adapt to 9:16)",
+   "needsImageGen": false,
+   "recommended": false,
+   "estUSD": 2.5,
+   "adaptUSD": "one-off budget exception",
+   "status": "adapt first ('make it our own'), then reuse"
+  },
+  {
+   "id": "opuscar:satellite-briefing",
+   "name": "Satellite Briefing",
+   "category": "Opuscar: Instruments & Evidence",
+   "uses": [
+    "Climate",
+    "News explainers",
+    "Geography"
+   ],
+   "film": "The Map Still Says Sea",
+   "line": "A satellite follows the map to the Aral Sea and finds a desert; only the part someone dammed came back.",
+   "poster": "https://github.com/lemomo-ai/lemo-opuscar/raw/main/styles/satellite-briefing/poster.jpg",
+   "gallery": "https://lemomo-ai.github.io/lemo-opuscar/styles/satellite-briefing/",
+   "demoSec": 37.8,
+   "aspect": "16:9 (adapt to 9:16)",
+   "needsImageGen": false,
+   "recommended": true,
+   "estUSD": 2.5,
+   "adaptUSD": "one-off budget exception",
+   "status": "adapt first ('make it our own'), then reuse"
+  },
+  {
+   "id": "opuscar:scifi-toon",
+   "name": "Sci-Fi Sitcom Toon",
+   "category": "Opuscar: Cartoons",
+   "uses": [
+    "Comedy",
+    "Tech brands",
+    "Social shorts"
+   ],
+   "film": "Coffee Run",
+   "line": "A jaded genius opens a portal just to buy coffee and tumbles through ever-stranger universes.",
+   "poster": "https://github.com/lemomo-ai/lemo-opuscar/raw/main/styles/scifi-toon/poster.jpg",
+   "gallery": "https://lemomo-ai.github.io/lemo-opuscar/styles/scifi-toon/",
+   "demoSec": 57.5,
+   "aspect": "16:9 (adapt to 9:16)",
+   "needsImageGen": false,
+   "recommended": false,
+   "estUSD": 2.5,
+   "adaptUSD": "one-off budget exception",
+   "status": "adapt first ('make it our own'), then reuse"
+  },
+  {
+   "id": "opuscar:scratch-film",
+   "name": "Scratch Film",
+   "category": "Opuscar: Film & Tape",
+   "uses": [
+    "Things that happen in the dark",
+    "One mark to a whole system",
+    "Small adventures told in light and shadow"
+   ],
+   "film": "The Night Climb",
+   "line": "A finger-long lanternfish climbs half a kilometre in the dark, hides its shadow with its own lights, and turns out to be one of countless animals rising every night.",
+   "poster": "https://github.com/lemomo-ai/lemo-opuscar/raw/main/styles/scratch-film/poster.jpg",
+   "gallery": "https://lemomo-ai.github.io/lemo-opuscar/styles/scratch-film/",
+   "demoSec": 52.0,
+   "aspect": "16:9 (adapt to 9:16)",
+   "needsImageGen": false,
+   "recommended": false,
+   "estUSD": 2.5,
+   "adaptUSD": "one-off budget exception",
+   "status": "adapt first ('make it our own'), then reuse"
+  },
+  {
+   "id": "opuscar:security-xray",
+   "name": "Security X-ray",
+   "category": "Opuscar: Instruments & Evidence",
+   "uses": [
+    "Airport and customs screening",
+    "Parcel and cargo inspection",
+    "Product internals"
+   ],
+   "film": "Night Shift at Lane 3",
+   "line": "One night at an airport screening console: a power bank, a bottle of water, and six live crabs that move in the CT.",
+   "poster": "https://github.com/lemomo-ai/lemo-opuscar/raw/main/styles/security-xray/poster.jpg",
+   "gallery": "https://lemomo-ai.github.io/lemo-opuscar/styles/security-xray/",
+   "demoSec": 51.9,
+   "aspect": "16:9 (adapt to 9:16)",
+   "needsImageGen": false,
+   "recommended": false,
+   "estUSD": 2.5,
+   "adaptUSD": "one-off budget exception",
+   "status": "adapt first ('make it our own'), then reuse"
+  },
+  {
+   "id": "opuscar:shadow-puppet",
+   "name": "Shadow Puppetry",
+   "category": "Opuscar: Traditional Crafts",
+   "uses": [
+    "Myths & folklore",
+    "Heritage",
+    "Festivals"
+   ],
+   "film": "Hou Yi Shoots the Suns",
+   "line": "Ten suns scorch the earth until the archer Hou Yi draws his bow, told with leather puppets on a lit screen.",
+   "poster": "https://github.com/lemomo-ai/lemo-opuscar/raw/main/styles/shadow-puppet/poster.jpg",
+   "gallery": "https://lemomo-ai.github.io/lemo-opuscar/styles/shadow-puppet/",
+   "demoSec": 54.4,
+   "aspect": "16:9 (adapt to 9:16)",
+   "needsImageGen": false,
+   "recommended": false,
+   "estUSD": 2.5,
+   "adaptUSD": "one-off budget exception",
+   "status": "adapt first ('make it our own'), then reuse"
+  },
+  {
+   "id": "opuscar:silent-film",
+   "name": "1920s Silent Film",
+   "category": "Opuscar: Film & Tape",
+   "uses": [
+    "Comedy",
+    "Retro brands",
+    "Silent storytelling"
+   ],
+   "film": "The Runaway Loaf",
+   "line": "A baker's boy chases a runaway loaf downhill, then breaks it in half for a hungry girl.",
+   "poster": "https://github.com/lemomo-ai/lemo-opuscar/raw/main/styles/silent-film/poster.jpg",
+   "gallery": "https://lemomo-ai.github.io/lemo-opuscar/styles/silent-film/",
+   "demoSec": 54.2,
+   "aspect": "16:9 (adapt to 9:16)",
+   "needsImageGen": false,
+   "recommended": false,
+   "estUSD": 2.5,
+   "adaptUSD": "one-off budget exception",
+   "status": "adapt first ('make it our own'), then reuse"
+  },
+  {
+   "id": "opuscar:silhouette-rhythm",
+   "name": "Silhouette Rhythm",
+   "category": "Opuscar: Graphic & Type",
+   "uses": [
+    "Music videos",
+    "Sports and team films",
+    "Nature and festival openers"
+   ],
+   "film": "Half a Beat",
+   "line": "A flock of flamingos moves on every beat, and one young bird is always half a beat late; the ripples the others left on the water teach it the beat.",
+   "poster": "https://github.com/lemomo-ai/lemo-opuscar/raw/main/styles/silhouette-rhythm/poster.jpg",
+   "gallery": "https://lemomo-ai.github.io/lemo-opuscar/styles/silhouette-rhythm/",
+   "demoSec": 49.0,
+   "aspect": "16:9 (adapt to 9:16)",
+   "needsImageGen": false,
+   "recommended": false,
+   "estUSD": 2.5,
+   "adaptUSD": "one-off budget exception",
+   "status": "adapt first ('make it our own'), then reuse"
+  },
+  {
+   "id": "opuscar:silkscreen-poster",
+   "name": "Silkscreen Travel Poster",
+   "category": "Opuscar: Print & Printmaking",
+   "uses": [
+    "Destination guides",
+    "Tourism",
+    "Event posters"
+   ],
+   "film": "The Long Way Home",
+   "line": "A traveller crosses the world one full-bleed screen print at a time, a ticket stub counting the distance from home, until the far side turns into the way back.",
+   "poster": "https://github.com/lemomo-ai/lemo-opuscar/raw/main/styles/silkscreen-poster/poster.jpg",
+   "gallery": "https://lemomo-ai.github.io/lemo-opuscar/styles/silkscreen-poster/",
+   "demoSec": 50.0,
+   "aspect": "16:9 (adapt to 9:16)",
+   "needsImageGen": false,
+   "recommended": false,
+   "estUSD": 2.5,
+   "adaptUSD": "one-off budget exception",
+   "status": "adapt first ('make it our own'), then reuse"
+  },
+  {
+   "id": "opuscar:sketchnote",
+   "name": "Sketchnote",
+   "category": "Opuscar: Sketch & Board",
+   "uses": [
+    "Lecture notes",
+    "Science explainers",
+    "One-page summaries"
+   ],
+   "film": "How Bees Make Honey",
+   "line": "One bee makes 1/12 of a teaspoon of honey in her life; the pen follows one yellow drop from flower to jar until the whole page is a poster.",
+   "poster": "https://github.com/lemomo-ai/lemo-opuscar/raw/main/styles/sketchnote/poster.jpg",
+   "gallery": "https://lemomo-ai.github.io/lemo-opuscar/styles/sketchnote/",
+   "demoSec": 51.0,
+   "aspect": "16:9 (adapt to 9:16)",
+   "needsImageGen": false,
+   "recommended": true,
+   "estUSD": 2.5,
+   "adaptUSD": "one-off budget exception",
+   "status": "adapt first ('make it our own'), then reuse"
+  },
+  {
+   "id": "opuscar:spreadsheet",
+   "name": "Spreadsheet Film",
+   "category": "Opuscar: Screens & Interfaces",
+   "uses": [
+    "Data literacy",
+    "Finance & costs",
+    "Analytics explainers"
+   ],
+   "film": "The Hidden Column",
+   "line": "The total says treatment B; unhide the stone-size columns and A wins every group. Simpson's paradox told in one sheet, 1 cell = 1 patient.",
+   "poster": "https://github.com/lemomo-ai/lemo-opuscar/raw/main/styles/spreadsheet/poster.jpg",
+   "gallery": "https://lemomo-ai.github.io/lemo-opuscar/styles/spreadsheet/",
+   "demoSec": 52.0,
+   "aspect": "16:9 (adapt to 9:16)",
+   "needsImageGen": false,
+   "recommended": false,
+   "estUSD": 2.5,
+   "adaptUSD": "one-off budget exception",
+   "status": "adapt first ('make it our own'), then reuse"
+  },
+  {
+   "id": "opuscar:spy-titles",
+   "name": "60s Spy Title Sequence",
+   "category": "Opuscar: Graphic & Type",
+   "uses": [
+    "Title sequences",
+    "Event openers",
+    "Trailers"
+   ],
+   "film": "The Velvet Cipher",
+   "line": "Opening titles for an imaginary 1964 spy film: a chase for a stolen key until the shapes lock into the title.",
+   "poster": "https://github.com/lemomo-ai/lemo-opuscar/raw/main/styles/spy-titles/poster.jpg",
+   "gallery": "https://lemomo-ai.github.io/lemo-opuscar/styles/spy-titles/",
+   "demoSec": 44.1,
+   "aspect": "16:9 (adapt to 9:16)",
+   "needsImageGen": false,
+   "recommended": false,
+   "estUSD": 2.5,
+   "adaptUSD": "one-off budget exception",
+   "status": "adapt first ('make it our own'), then reuse"
+  },
+  {
+   "id": "opuscar:stained-glass",
+   "name": "Stained Glass",
+   "category": "Opuscar: Traditional Crafts",
+   "uses": [
+    "Legends",
+    "Heritage",
+    "Holiday stories"
+   ],
+   "film": "The Dragon of the East Window",
+   "line": "Sunlight crosses a cathedral window from dawn to dusk, waking each pane of a knight-and-dragon tale.",
+   "poster": "https://github.com/lemomo-ai/lemo-opuscar/raw/main/styles/stained-glass/poster.jpg",
+   "gallery": "https://lemomo-ai.github.io/lemo-opuscar/styles/stained-glass/",
+   "demoSec": 56.5,
+   "aspect": "16:9 (adapt to 9:16)",
+   "needsImageGen": false,
+   "recommended": false,
+   "estUSD": 2.5,
+   "adaptUSD": "one-off budget exception",
+   "status": "adapt first ('make it our own'), then reuse"
+  },
+  {
+   "id": "opuscar:stick-explainer",
+   "name": "Stick-figure Explainer",
+   "category": "Opuscar: Sketch & Board",
+   "uses": [
+    "Science explainers",
+    "Networks & social ideas",
+    "Data comparisons"
+   ],
+   "film": "Six Hands Away",
+   "line": "A chain of hands from you to a stranger: tested with letters in 1967, explained by rings that outgrow the Earth, closed around the globe.",
+   "poster": "https://github.com/lemomo-ai/lemo-opuscar/raw/main/styles/stick-explainer/poster.jpg",
+   "gallery": "https://lemomo-ai.github.io/lemo-opuscar/styles/stick-explainer/",
+   "demoSec": 52.0,
+   "aspect": "16:9 (adapt to 9:16)",
+   "needsImageGen": false,
+   "recommended": false,
+   "estUSD": 2.5,
+   "adaptUSD": "one-off budget exception",
+   "status": "adapt first ('make it our own'), then reuse"
+  },
+  {
+   "id": "opuscar:swiss-motion",
+   "name": "Swiss Motion Graphics",
+   "category": "Opuscar: Graphic & Type",
+   "uses": [
+    "Brand identity",
+    "Events",
+    "Design education"
+   ],
+   "film": "Five Rules for a Poster",
+   "line": "A concert poster lays itself out by five Swiss design rules; the fifth is to break just one.",
+   "poster": "https://github.com/lemomo-ai/lemo-opuscar/raw/main/styles/swiss-motion/poster.jpg",
+   "gallery": "https://lemomo-ai.github.io/lemo-opuscar/styles/swiss-motion/",
+   "demoSec": 44.0,
+   "aspect": "16:9 (adapt to 9:16)",
+   "needsImageGen": false,
+   "recommended": false,
+   "estUSD": 2.5,
+   "adaptUSD": "one-off budget exception",
+   "status": "adapt first ('make it our own'), then reuse"
+  },
+  {
+   "id": "opuscar:teardown",
+   "name": "Exploded Teardown",
+   "category": "Opuscar: Line Diagrams",
+   "uses": [
+    "Hardware launches",
+    "Product pages",
+    "Spec explainers"
+   ],
+   "film": "21 Keys, Opened",
+   "line": "Half an open-source keyboard comes apart in one orbit, down to the chip, then closes with its real dimensions.",
+   "poster": "https://github.com/lemomo-ai/lemo-opuscar/raw/main/styles/teardown/poster.jpg",
+   "gallery": "https://lemomo-ai.github.io/lemo-opuscar/styles/teardown/",
+   "demoSec": 38.8,
+   "aspect": "16:9 (adapt to 9:16)",
+   "needsImageGen": false,
+   "recommended": true,
+   "estUSD": 2.5,
+   "adaptUSD": "one-off budget exception",
+   "status": "adapt first ('make it our own'), then reuse"
+  },
+  {
+   "id": "opuscar:telestrator",
+   "name": "Sports Telestrator",
+   "category": "Opuscar: Edit & Documentary",
+   "uses": [
+    "Sports analysis",
+    "Match recaps",
+    "Coaching"
+   ],
+   "film": "Freeze Frame",
+   "line": "Down 3–0 at half-time, Fenerbahçe scored three in 12 minutes: freeze, draw, split screen, shot map.",
+   "poster": "https://github.com/lemomo-ai/lemo-opuscar/raw/main/styles/telestrator/poster.jpg",
+   "gallery": "https://lemomo-ai.github.io/lemo-opuscar/styles/telestrator/",
+   "demoSec": 54.4,
+   "aspect": "16:9 (adapt to 9:16)",
+   "needsImageGen": false,
+   "recommended": false,
+   "estUSD": 2.5,
+   "adaptUSD": "one-off budget exception",
+   "status": "adapt first ('make it our own'), then reuse"
+  },
+  {
+   "id": "opuscar:text-flash-cuts",
+   "name": "Text Flash Cuts",
+   "category": "Opuscar: Graphic & Type",
+   "uses": [
+    "Suspense & drama trailers",
+    "Title sequences",
+    "Manifesto films"
+   ],
+   "film": "Behind You",
+   "line": "A letter, a phone call, a wall of windows, thirteen steps: the girl who told him not to look back is always one step closer, until she turns her head.",
+   "poster": "https://github.com/lemomo-ai/lemo-opuscar/raw/main/styles/text-flash-cuts/poster.jpg",
+   "gallery": "https://lemomo-ai.github.io/lemo-opuscar/styles/text-flash-cuts/",
+   "demoSec": 46.2,
+   "aspect": "16:9 (adapt to 9:16)",
+   "needsImageGen": true,
+   "recommended": false,
+   "estUSD": 2.5,
+   "adaptUSD": "one-off budget exception",
+   "status": "adapt first ('make it our own'), then reuse"
+  },
+  {
+   "id": "opuscar:thermal-camera",
+   "name": "Thermal Camera",
+   "category": "Opuscar: Instruments & Evidence",
+   "uses": [
+    "Building and energy inspection",
+    "Wildlife at night",
+    "Machines and electrics"
+   ],
+   "film": "A Building on a Winter Night",
+   "line": "A thermal camera circles an old apartment block on a snowy night: a leaking window, pipes inside the walls, a cat asleep on a warm bonnet, and the same block a year after its retrofit.",
+   "poster": "https://github.com/lemomo-ai/lemo-opuscar/raw/main/styles/thermal-camera/poster.jpg",
+   "gallery": "https://lemomo-ai.github.io/lemo-opuscar/styles/thermal-camera/",
+   "demoSec": 49.0,
+   "aspect": "16:9 (adapt to 9:16)",
+   "needsImageGen": false,
+   "recommended": true,
+   "estUSD": 2.5,
+   "adaptUSD": "one-off budget exception",
+   "status": "adapt first ('make it our own'), then reuse"
+  },
+  {
+   "id": "opuscar:tilt-shift",
+   "name": "Tilt-Shift Miniature",
+   "category": "Opuscar: 3D & Miniature",
+   "uses": [
+    "City promos",
+    "Real estate",
+    "Transport"
+   ],
+   "film": "Toy Town Rush Hour",
+   "line": "Morning rush hour in a town that looks like a model: traffic, trains and tiny people.",
+   "poster": "https://github.com/lemomo-ai/lemo-opuscar/raw/main/styles/tilt-shift/poster.jpg",
+   "gallery": "https://lemomo-ai.github.io/lemo-opuscar/styles/tilt-shift/",
+   "demoSec": 38.0,
+   "aspect": "16:9 (adapt to 9:16)",
+   "needsImageGen": false,
+   "recommended": false,
+   "estUSD": 2.5,
+   "adaptUSD": "one-off budget exception",
+   "status": "adapt first ('make it our own'), then reuse"
+  },
+  {
+   "id": "opuscar:transit-map",
+   "name": "Transit Map",
+   "category": "Opuscar: Data & Maps",
+   "uses": [
+    "Transport",
+    "Growth over time",
+    "Networks"
+   ],
+   "film": "6 Kilometres",
+   "line": "A printed metro map grows from one 6 km line in 1993 to 21 lines and 906 km.",
+   "poster": "https://github.com/lemomo-ai/lemo-opuscar/raw/main/styles/transit-map/poster.jpg",
+   "gallery": "https://lemomo-ai.github.io/lemo-opuscar/styles/transit-map/",
+   "demoSec": 47.0,
+   "aspect": "16:9 (adapt to 9:16)",
+   "needsImageGen": false,
+   "recommended": true,
+   "estUSD": 2.5,
+   "adaptUSD": "one-off budget exception",
+   "status": "adapt first ('make it our own'), then reuse"
+  },
+  {
+   "id": "opuscar:ukiyoe",
+   "name": "Ukiyo-e",
+   "category": "Opuscar: Traditional Crafts",
+   "uses": [
+    "Travel",
+    "Japanese culture",
+    "Poetry"
+   ],
+   "film": "Toward the Mountain",
+   "line": "A traveller walks toward a distant mountain; every shot is a woodblock print, a great wave at the climax, the mountain and the whole scroll at the end.",
+   "poster": "https://github.com/lemomo-ai/lemo-opuscar/raw/main/styles/ukiyoe/poster.jpg",
+   "gallery": "https://lemomo-ai.github.io/lemo-opuscar/styles/ukiyoe/",
+   "demoSec": 44.0,
+   "aspect": "16:9 (adapt to 9:16)",
+   "needsImageGen": false,
+   "recommended": false,
+   "estUSD": 2.5,
+   "adaptUSD": "one-off budget exception",
+   "status": "adapt first ('make it our own'), then reuse"
+  },
+  {
+   "id": "opuscar:urban-sketch",
+   "name": "Urban Sketch · Pen & Wash",
+   "category": "Opuscar: Painting & Illustration",
+   "uses": [
+    "City & travel",
+    "Architecture",
+    "Lifestyle brands"
+   ],
+   "film": "Where the Wind Went",
+   "line": "A park that is only a pen sketch; wherever the wind carries her straw hat, colour follows.",
+   "poster": "https://github.com/lemomo-ai/lemo-opuscar/raw/main/styles/urban-sketch/poster.jpg",
+   "gallery": "https://lemomo-ai.github.io/lemo-opuscar/styles/urban-sketch/",
+   "demoSec": 33.4,
+   "aspect": "16:9 (adapt to 9:16)",
+   "needsImageGen": false,
+   "recommended": false,
+   "estUSD": 2.5,
+   "adaptUSD": "one-off budget exception",
+   "status": "adapt first ('make it our own'), then reuse"
+  },
+  {
+   "id": "opuscar:vintage-collage",
+   "name": "Vintage Engraving Collage",
+   "category": "Opuscar: Print & Printmaking",
+   "uses": [
+    "The history of an object",
+    "Magazine-style explainers on ideas and society",
+    "Archive and collecting stories"
+   ],
+   "film": "The Inverted Jenny",
+   "line": "A 1918 airmail sheet printed with its plane upside down: bought for $24, cut up and scattered, and number 66 is still missing.",
+   "poster": "https://github.com/lemomo-ai/lemo-opuscar/raw/main/styles/vintage-collage/poster.jpg",
+   "gallery": "https://lemomo-ai.github.io/lemo-opuscar/styles/vintage-collage/",
+   "demoSec": 52.0,
+   "aspect": "16:9 (adapt to 9:16)",
+   "needsImageGen": false,
+   "recommended": false,
+   "estUSD": 2.5,
+   "adaptUSD": "one-off budget exception",
+   "status": "adapt first ('make it our own'), then reuse"
+  },
+  {
+   "id": "opuscar:visual-investigation",
+   "name": "Visual Investigation",
+   "category": "Opuscar: Edit & Documentary",
+   "uses": [
+    "Reconstructions",
+    "Fact-checks",
+    "Incident reports"
+   ],
+   "film": "The Hindenburg: Four Minutes, 32 Seconds",
+   "line": "Newsreel, photos, testimony and the 1937 inquiry on one clock: five sources point to the same spot.",
+   "poster": "https://github.com/lemomo-ai/lemo-opuscar/raw/main/styles/visual-investigation/poster.jpg",
+   "gallery": "https://lemomo-ai.github.io/lemo-opuscar/styles/visual-investigation/",
+   "demoSec": 60.0,
+   "aspect": "16:9 (adapt to 9:16)",
+   "needsImageGen": false,
+   "recommended": true,
+   "estUSD": 2.5,
+   "adaptUSD": "one-off budget exception",
+   "status": "adapt first ('make it our own'), then reuse"
+  },
+  {
+   "id": "opuscar:watercolor",
+   "name": "Watercolor Brush",
+   "category": "Opuscar: Painting & Illustration",
+   "uses": [
+    "Nature documentary",
+    "Travel",
+    "Science explainers"
+   ],
+   "film": "Follow the Rain",
+   "line": "Follow the rain from Australia's red desert heart to its green coast in one unbroken painted walk.",
+   "poster": "https://github.com/lemomo-ai/lemo-opuscar/raw/main/styles/watercolor/poster.jpg",
+   "gallery": "https://lemomo-ai.github.io/lemo-opuscar/styles/watercolor/",
+   "demoSec": 113.6,
+   "aspect": "16:9 (adapt to 9:16)",
+   "needsImageGen": false,
+   "recommended": false,
+   "estUSD": 2.5,
+   "adaptUSD": "one-off budget exception",
+   "status": "adapt first ('make it our own'), then reuse"
+  },
+  {
+   "id": "opuscar:white-model",
+   "name": "Projection-Mapped Model",
+   "category": "Opuscar: Data & Maps",
+   "uses": [
+    "Urban planning",
+    "Exhibitions",
+    "City data"
+   ],
+   "film": "How a Flattened City Grew Back",
+   "line": "A projector paints Rotterdam's white model layer by layer, from the 1940 gap to today's towers.",
+   "poster": "https://github.com/lemomo-ai/lemo-opuscar/raw/main/styles/white-model/poster.jpg",
+   "gallery": "https://lemomo-ai.github.io/lemo-opuscar/styles/white-model/",
+   "demoSec": 40.0,
+   "aspect": "16:9 (adapt to 9:16)",
+   "needsImageGen": false,
+   "recommended": true,
+   "estUSD": 2.5,
+   "adaptUSD": "one-off budget exception",
+   "status": "adapt first ('make it our own'), then reuse"
+  },
+  {
+   "id": "opuscar:whiteboard",
+   "name": "Whiteboard Explainer",
+   "category": "Opuscar: Sketch & Board",
+   "uses": [
+    "Explainers",
+    "Online courses",
+    "Science"
+   ],
+   "film": "Einstein in Your Pocket",
+   "line": "How your phone knows where you are: GPS, atomic clocks, and the 38 microseconds relativity adds every day.",
+   "poster": "https://github.com/lemomo-ai/lemo-opuscar/raw/main/styles/whiteboard/poster.jpg",
+   "gallery": "https://lemomo-ai.github.io/lemo-opuscar/styles/whiteboard/",
+   "demoSec": 111.0,
+   "aspect": "16:9 (adapt to 9:16)",
+   "needsImageGen": false,
+   "recommended": true,
+   "estUSD": 2.5,
+   "adaptUSD": "one-off budget exception",
+   "status": "adapt first ('make it our own'), then reuse"
+  },
+  {
+   "id": "opuscar:woodcut",
+   "name": "Woodcut Print",
+   "category": "Opuscar: Print & Printmaking",
+   "uses": [
+    "Folk tales",
+    "Craft brands",
+    "Book trailers"
+   ],
+   "film": "The Bell Founder",
+   "line": "A village spends a whole winter casting one bell; the first time it rings, the snow stops.",
+   "poster": "https://github.com/lemomo-ai/lemo-opuscar/raw/main/styles/woodcut/poster.jpg",
+   "gallery": "https://lemomo-ai.github.io/lemo-opuscar/styles/woodcut/",
+   "demoSec": 58.5,
+   "aspect": "16:9 (adapt to 9:16)",
+   "needsImageGen": false,
+   "recommended": false,
+   "estUSD": 2.5,
+   "adaptUSD": "one-off budget exception",
+   "status": "adapt first ('make it our own'), then reuse"
+  }
+ ]
+}

@@ -1,0 +1,16 @@
+{
+  "name": "openanstruk-office",
+  "version": "2.0.0",
+  "private": true,
+  "description": "A cute 3D office where six AI staff make reels for @openanstruk and Aina, with a Producer desk to plan, start, approve and track runs.",
+  "type": "module",
+  "engines": { "node": ">=22" },
+  "scripts": {
+    "start": "node server/server.mjs",
+    "demo": "node server/server.mjs --engine dry",
+    "run": "node orchestrator/run.mjs",
+    "dry": "node orchestrator/run.mjs --engine dry --topic \"Gempa kecil tapi merusak\" --pace 3",
+    "test": "node --test \"test/*.test.mjs\"",
+    "check": "node tools/check-events.mjs data/sample-run.jsonl"
+  }
+}

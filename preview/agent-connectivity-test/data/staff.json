@@ -1,0 +1,46 @@
+{
+  "capUSD": 4,
+  "guard": { "wrapUpUSD": 3.0, "stopUSD": 3.6 },
+  "staff": [
+    {
+      "id": "producer", "name": "Pak Prod", "role": "Producer (orchestrator)",
+      "color": "#ff8a5b", "hat": "cap", "desk": "producer",
+      "model": { "phase1": "sonnet/medium", "phase2": "haiku/low" },
+      "skills": ["kalender-konten", "JADWAL-REEL.md", "aina/JADWAL.md"]
+    },
+    {
+      "id": "researcher", "name": "Riri Riset", "role": "Researcher / fact-checker",
+      "color": "#4fa3e0", "hat": "glasses", "desk": "research",
+      "model": { "phase1": "sonnet/medium + opus check", "phase2": "sonnet/medium" },
+      "skills": ["trend-radar", "topic-gaps", "fact sheets", "provenance"]
+    },
+    {
+      "id": "scriptwriter", "name": "Nana Naskah", "role": "Scriptwriter",
+      "color": "#b07be0", "hat": "beret", "desk": "writers",
+      "model": { "phase1": "opus/high", "phase2": "opus/high" },
+      "skills": ["naskah-reel", "ig-carousel refs", "cek-naskah.mjs"]
+    },
+    {
+      "id": "animator", "name": "Ani Animasi", "role": "Director-Animator",
+      "color": "#3bb273", "hat": "headphones", "desk": "animation",
+      "model": { "phase1": "sonnet/high", "phase2": "sonnet/high" },
+      "skills": ["kolase-reel", "hyperframes", "hyperframes-registry", "lemo-opuscar", "lib/reel"]
+    },
+    {
+      "id": "critic", "name": "Kiki Kritik", "role": "Critic (QA gate)",
+      "color": "#e0b43b", "hat": "monocle", "desk": "critic",
+      "model": { "phase1": "opus/medium", "phase2": "opus/medium" },
+      "skills": ["naskah-critic", "prose-critic", "slide-critic", "attention-check"]
+    },
+    {
+      "id": "ops", "name": "Opi Ops", "role": "Render and publish",
+      "color": "#7a8aa0", "hat": "helmet", "desk": "ops",
+      "model": { "phase1": "haiku/low", "phase2": "haiku/low" },
+      "skills": ["tts.py", "waktu.mjs", "campur.mjs", "final.sh", "insights.mjs"]
+    }
+  ],
+  "visitors": [
+    { "id": "ulza", "name": "Ulza", "role": "Records the voice-over (H-2)", "color": "#1a2f5e" },
+    { "id": "aina", "name": "Aina", "role": "Records on camera", "color": "#2fa37a" }
+  ]
+}

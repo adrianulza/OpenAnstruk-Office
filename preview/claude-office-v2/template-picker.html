@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Template Board · OpenAnstruk Virtual Office</title>
+<style>
+  :root{--bg:#fff7ec;--ink:#2b2340;--card:#fff;--line:#f0dcc4;--accent:#ff8a5b;--ok:#3bb273;--warn:#e9a23b;--muted:#8a7f99}
+  *{box-sizing:border-box}
+  body{margin:0;font-family:system-ui,"Segoe UI",sans-serif;background:var(--bg);color:var(--ink)}
+  header{position:sticky;top:0;z-index:5;background:var(--bg);padding:14px 20px 10px;border-bottom:2px dashed var(--line)}
+  h1{margin:0 0 8px;font-size:22px}
+  .bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+  input,select{font:inherit;padding:7px 10px;border:2px solid var(--line);border-radius:12px;background:#fff}
+  label.chk{display:flex;gap:6px;align-items:center;font-size:14px}
+  .cap{margin-left:auto;font-weight:600}
+  main{display:grid;grid-template-columns:1fr 340px;gap:18px;padding:18px 20px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:14px;align-content:start}
+  .card{background:var(--card);border:2px solid var(--line);border-radius:18px;overflow:hidden;cursor:pointer;transition:transform .12s,box-shadow .12s}
+  .card:hover{transform:translateY(-3px) rotate(-.4deg);box-shadow:0 8px 0 var(--line)}
+  .card.sel{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent)}
+  .thumb{aspect-ratio:16/9;background:#f6eadb center/cover no-repeat;display:flex;align-items:center;justify-content:center;font-size:30px}
+  .body{padding:10px 12px}
+  .name{font-weight:700;font-size:15px}
+  .cat{font-size:12px;color:var(--muted)}
+  .tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}
+  .tag{font-size:11px;padding:2px 7px;border-radius:99px;background:#f6eadb}
+  .tag.rec{background:#ffe1d3}.tag.ok{background:#d9f3e4}.tag.warn{background:#fdecc8}
+  aside{position:sticky;top:110px;align-self:start;background:#fff;border:2px solid var(--line);border-radius:18px;padding:14px}
+  aside h2{margin:0 0 6px;font-size:17px}
+  pre{background:#2b2340;color:#fff7ec;border-radius:12px;padding:10px;font-size:12px;white-space:pre-wrap}
+  button{font:inherit;font-weight:700;border:0;border-radius:12px;padding:9px 14px;background:var(--accent);color:#fff;cursor:pointer}
+  .row{display:flex;gap:8px;margin:6px 0;align-items:center}
+  .row>*{flex:1}
+  .meter{height:10px;border-radius:99px;background:#f6eadb;overflow:hidden}
+  .meter>i{display:block;height:100%}
+  a{color:var(--accent)}
+  .muted{color:var(--muted);font-size:13px}
+  @media(max-width:900px){main{grid-template-columns:1fr}aside{position:static}}
+</style>
+</head>
+<body>
+<header>
+  <h1>🎬 Template Board</h1>
+  <div class="bar">
+    <input id="q" placeholder="Search: map, earthquake, explainer…" size="28">
+    <select id="cat"><option value="">All categories</option></select>
+    <select id="kreator"><option value="openanstruk">OpenAnstruk</option><option value="aina">Aina</option></select>
+    <label class="chk"><input type="checkbox" id="rec"> Recommended for our topics</label>
+    <label class="chk"><input type="checkbox" id="ready"> Ready now only</label>
+    <span class="cap" id="count"></span>
+  </div>
+</header>
+<main>
+  <section class="grid" id="grid"></section>
+  <aside id="panel"><h2>Pick a template</h2><p class="muted">Choose a card. Send it to the Producer desk (office on your PC) or copy the run config for the command line. Nothing runs from this page and it costs zero tokens.</p></aside>
+</main>
+<script>
+const CAP = 4;
+let DATA = [], picked = null;
+const esc = (v) => String(v ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const safeUrl = (u) => /^https?:\/\//i.test(u || '') ? u : '';
+const $ = (id) => document.getElementById(id);
+
+fetch('templates.json').then(r => r.json()).then(init).catch(() => {
+  $('grid').innerHTML = '<p>Open this page through the office server (<code>npm start</code>) or any local server so it can read templates.json.</p>';
+});
+
+function init(d){
+  DATA = d.templates;
+  const cats = [...new Set(DATA.map(t => t.category))];
+  cats.forEach(c => $('cat').insertAdjacentHTML('beforeend', `<option>${esc(c)}</option>`));
+  ['q','cat','kreator','rec','ready'].forEach(id => $(id).addEventListener('input', render));
+  render();
+}
+
+const isReady = (t) => t.status === 'ready';
+
+function render(){
+  const q = $('q').value.toLowerCase(), cat = $('cat').value, rec = $('rec').checked, ready = $('ready').checked, k = $('kreator').value;
+  const list = DATA.filter(t =>
+    (!cat || t.category === cat) &&
+    (!rec || t.recommended || !t.id.startsWith('opuscar:')) &&
+    (!ready || isReady(t)) &&
+    (!t.kreator || t.kreator.includes(k)) &&
+    (!q || JSON.stringify(t).toLowerCase().includes(q)));
+  $('count').textContent = `${list.length} templates · cap $${CAP}/video`;
+  $('grid').innerHTML = list.map(t => `
+    <div class="card ${picked && picked.id === t.id ? 'sel' : ''}" data-id="${esc(t.id)}">
+      <div class="thumb" style="${safeUrl(t.poster) ? `background-image:url('${esc(safeUrl(t.poster))}')` : ''}">${safeUrl(t.poster) ? '' : '🏗️'}</div>
+      <div class="body">
+        <div class="name">${esc(t.name)}</div>
+        <div class="cat">${esc(t.category)}</div>
+        <div class="tags">
+          ${t.recommended ? '<span class="tag rec">★ fits our topics</span>' : ''}
+          ${isReady(t) ? '<span class="tag ok">ready</span>' : `<span class="tag warn">${t.id.startsWith('opuscar:') ? 'adapt first' : esc(t.status)}</span>`}
+          ${t.needsImageGen ? '<span class="tag warn">needs image generator</span>' : ''}
+          <span class="tag">~$${Number(t.estUSD).toFixed(2)}</span>
+        </div>
+      </div>
+    </div>`).join('');
+  document.querySelectorAll('.card').forEach(c => c.onclick = () => pick(c.dataset.id));
+}
+
+function pick(id){
+  picked = DATA.find(t => t.id === id);
+  render();
+  const t = picked, k = $('kreator').value, ready = isReady(t);
+  const pct = Math.min(100, t.estUSD / CAP * 100);
+  const color = pct < 60 ? 'var(--ok)' : pct < 90 ? 'var(--warn)' : '#d9534f';
+  // Same shape that `node orchestrator/run.mjs --config run.json` and the Producer desk accept.
+  const run = ready
+    ? { kreator: k, template: t.id, topic: '', slot: '', notes: '', approve: ['script', 'final'], platforms: ['instagram', 'tiktok'], budgetUSD: CAP }
+    : { kreator: k, template: t.id, phase: 1 };
+  const gallery = safeUrl(t.gallery);
+  $('panel').innerHTML = `
+    <h2>${esc(t.name)}</h2>
+    <div class="muted">${esc(t.line || t.basis || '')}</div>
+    ${gallery ? `<p><a href="${esc(gallery)}" target="_blank" rel="noopener">▶ Watch the demo film</a> (${Math.round(t.demoSec || 0)} s)</p>` : ''}
+    <div class="row"><span>Estimated per video</span><b>$${Number(t.estUSD).toFixed(2)}</b></div>
+    <div class="meter"><i style="width:${pct}%;background:${color}"></i></div>
+    ${ready ? '' : '<p class="muted">Not ready yet: first a one-off adaptation run (phase 1) makes it our own (9:16, Bahasa Indonesia, brand). It pauses twice for your OK, then the template counts as ready.</p>'}
+    ${ready ? `<div class="row"><label>Topic <input id="topic" placeholder="e.g. Megathrust Aceh"></label></div>
+    <div class="row"><label>Slot <input id="slot" type="date"></label></div>
+    <div class="row"><label>Notes <input id="notes" placeholder="angle, hook, sources"></label></div>` : ''}
+    <pre id="cfg"></pre>
+    <div class="row" style="flex-wrap:wrap">
+      ${ready ? '<button id="send">💬 Send to Producer desk</button>' : ''}
+      <button id="copy" style="background:#2b2340">Copy run config</button>
+    </div>
+    <p class="muted" id="hint"></p>`;
+  const cfg = $('cfg');
+  const upd = () => {
+    if (ready) { run.topic = $('topic').value.trim(); run.slot = $('slot').value; run.notes = $('notes').value.trim(); }
+    cfg.textContent = JSON.stringify(run, null, 2);
+    $('hint').innerHTML = `Save it as <code>run.json</code>, then: <code>node orchestrator/run.mjs --config run.json --engine claude-cli --repo &lt;your repo&gt;</code>`;
+  };
+  if (ready) ['topic', 'slot', 'notes'].forEach((id) => ($(id).oninput = upd));
+  upd();
+  $('copy').onclick = () => navigator.clipboard.writeText(cfg.textContent).then(() => ($('copy').textContent = 'Copied ✓'));
+  if (ready) $('send').onclick = () => {
+    localStorage.setItem('office.draft', JSON.stringify(run));
+    if (window.opener && !window.opener.closed) { window.opener.focus(); $('send').textContent = 'Sent ✓ (see the office tab)'; }
+    else location.href = 'index.html';
+  };
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,55 @@
+{"t": 2, "run": "0026-gempa-kecil-merusak", "agent": "producer", "type": "run_start", "summary": "Slot 20 Nov: Gempa kecil tapi merusak (Cianjur 2022)", "template": "kolase-browser", "model": "haiku", "effort": "low"}
+{"t": 6, "run": "0026-gempa-kecil-merusak", "agent": "producer", "type": "thinking", "summary": "Cek JADWAL-REEL: tenggat 21 Nov terkunci, sumber sudah terbuka"}
+{"t": 10, "run": "0026-gempa-kecil-merusak", "agent": "producer", "type": "cost", "usd": 0.004, "usage": {"in": 2000, "out": 800, "cache_read": 13000, "cache_write": 2000}}
+{"t": 11, "run": "0026-gempa-kecil-merusak", "agent": "producer", "type": "handoff", "summary": "Brief ke Riri: kartu backlog 24 Okt + bukti Bogor 15 Okt", "to": "researcher"}
+{"t": 16, "run": "0026-gempa-kecil-merusak", "agent": "researcher", "type": "task_start", "summary": "Buka kartu celah dan berita BMKG Bogor 15 Okt", "model": "sonnet", "effort": "medium"}
+{"t": 22, "run": "0026-gempa-kecil-merusak", "agent": "researcher", "type": "tool", "summary": "node lib/riset/celah.mjs: 3 pertanyaan nyata ditemukan"}
+{"t": 30, "run": "0026-gempa-kecil-merusak", "agent": "researcher", "type": "thinking", "summary": "M4,1 dangkal: kenapa 349 rumah rusak? Cari kedalaman resmi"}
+{"t": 38, "run": "0026-gempa-kecil-merusak", "agent": "researcher", "type": "tool", "summary": "Web: siaran pers BMKG, kedalaman 5 km"}
+{"t": 46, "run": "0026-gempa-kecil-merusak", "agent": "researcher", "type": "thinking", "summary": "Cianjur 2022: angka korban dari BNPB, bukan media"}
+{"t": 52, "run": "0026-gempa-kecil-merusak", "agent": "researcher", "type": "cost", "usd": 0.22, "usage": {"in": 3000, "out": 1200, "cache_read": 27000, "cache_write": 3000}}
+{"t": 53, "run": "0026-gempa-kecil-merusak", "agent": "researcher", "type": "done", "summary": "Fact sheet: 7 angka, semua bersumber dan bertanggal"}
+{"t": 54, "run": "0026-gempa-kecil-merusak", "agent": "researcher", "type": "handoff", "summary": "Fact sheet siap untuk naskah", "to": "scriptwriter"}
+{"t": 58, "run": "0026-gempa-kecil-merusak", "agent": "scriptwriter", "type": "task_start", "summary": "Hook 2 detik tanpa angka, ragam lisan", "model": "opus", "effort": "high"}
+{"t": 66, "run": "0026-gempa-kecil-merusak", "agent": "scriptwriter", "type": "thinking", "summary": "Hook: 'Gempanya kecil. Kok rumahnya bisa roboh?'"}
+{"t": 74, "run": "0026-gempa-kecil-merusak", "agent": "scriptwriter", "type": "tool", "summary": "Tulis script.json: 14 adegan, isyarat kata"}
+{"t": 84, "run": "0026-gempa-kecil-merusak", "agent": "scriptwriter", "type": "tool", "summary": "node tools/naskah/cek-naskah.mjs: 0 galat, 2 tandai"}
+{"t": 88, "run": "0026-gempa-kecil-merusak", "agent": "scriptwriter", "type": "cost", "usd": 0.38, "usage": {"in": 2000, "out": 3000, "cache_read": 33000, "cache_write": 2000}}
+{"t": 89, "run": "0026-gempa-kecil-merusak", "agent": "scriptwriter", "type": "handoff", "summary": "Naskah draf 1 ke kritikus", "to": "critic"}
+{"t": 93, "run": "0026-gempa-kecil-merusak", "agent": "critic", "type": "task_start", "summary": "naskah-critic satu putaran (batch)", "model": "opus", "effort": "medium"}
+{"t": 101, "run": "0026-gempa-kecil-merusak", "agent": "critic", "type": "thinking", "summary": "Baris 6 menyebut 'besi', harus 'baja tulangan'"}
+{"t": 106, "run": "0026-gempa-kecil-merusak", "agent": "critic", "type": "blocked", "summary": "Blocker: angka 349 rumah tanpa tanggal di provenance"}
+{"t": 108, "run": "0026-gempa-kecil-merusak", "agent": "critic", "type": "cost", "usd": 0.1, "usage": {"in": 3000, "out": 1500, "cache_read": 32000, "cache_write": 3000}}
+{"t": 109, "run": "0026-gempa-kecil-merusak", "agent": "critic", "type": "handoff", "summary": "Kembalikan: 1 blocker, 1 should-fix", "to": "scriptwriter"}
+{"t": 112, "run": "0026-gempa-kecil-merusak", "agent": "scriptwriter", "type": "thinking", "summary": "Perbaiki provenance, ganti 'besi' jadi 'baja tulangan'"}
+{"t": 118, "run": "0026-gempa-kecil-merusak", "agent": "scriptwriter", "type": "tool", "summary": "Revisi naskah draf 2"}
+{"t": 121, "run": "0026-gempa-kecil-merusak", "agent": "critic", "type": "tool", "summary": "Cek ulang hanya baris yang berubah"}
+{"t": 124, "run": "0026-gempa-kecil-merusak", "agent": "critic", "type": "done", "summary": "NO FINDINGS. Naskah lolos"}
+{"t": 125, "run": "0026-gempa-kecil-merusak", "agent": "critic", "type": "task_start", "summary": "attention-check mode 1: hook, tempo, EPPM", "model": "sonnet", "effort": "low"}
+{"t": 130, "run": "0026-gempa-kecil-merusak", "agent": "critic", "type": "cost", "usd": 0.04, "usage": {"in": 2000, "out": 1200, "cache_read": 28000, "cache_write": 2000}}
+{"t": 131, "run": "0026-gempa-kecil-merusak", "agent": "critic", "type": "done", "summary": "Skor atensi 31/36, lolos lantai"}
+{"t": 132, "run": "0026-gempa-kecil-merusak", "agent": "scriptwriter", "type": "done", "summary": "Naskah final dikirim ke Ulza (H-4)"}
+{"t": 133, "run": "0026-gempa-kecil-merusak", "agent": "scriptwriter", "type": "handoff", "summary": "Storyboard dan script.json ke animator", "to": "animator"}
+{"t": 137, "run": "0026-gempa-kecil-merusak", "agent": "animator", "type": "task_start", "summary": "Salin templates/reel-kolase ke posts/0026", "model": "sonnet", "effort": "high"}
+{"t": 145, "run": "0026-gempa-kecil-merusak", "agent": "animator", "type": "thinking", "summary": "Peta Jawa Barat: titik Cianjur dan Bogor, satu per satu"}
+{"t": 152, "run": "0026-gempa-kecil-merusak", "agent": "animator", "type": "tool", "summary": "hyperframes catalog --query 'map pulse marker'"}
+{"t": 160, "run": "0026-gempa-kecil-merusak", "agent": "animator", "type": "tool", "summary": "reel.js: 14 halaman K.page, rumah tembokan bergetar"}
+{"t": 170, "run": "0026-gempa-kecil-merusak", "agent": "animator", "type": "tool", "summary": "node lib/reel/build.mjs --stills 0,2.6,9.0"}
+{"t": 178, "run": "0026-gempa-kecil-merusak", "agent": "animator", "type": "thinking", "summary": "Halaman 9 terlalu ramai, pecah jadi dua"}
+{"t": 186, "run": "0026-gempa-kecil-merusak", "agent": "animator", "type": "cost", "usd": 0.95, "usage": {"in": 3000, "out": 2500, "cache_read": 57000, "cache_write": 3000}}
+{"t": 187, "run": "0026-gempa-kecil-merusak", "agent": "animator", "type": "done", "summary": "Animasi draf siap, tunggu suara asli"}
+{"t": 188, "run": "0026-gempa-kecil-merusak", "agent": "producer", "type": "waiting_human", "summary": "Ulza, rekam VO sesuai script.json (H-2)", "to": "ulza"}
+{"t": 190, "run": "0026-gempa-kecil-merusak", "agent": "ulza", "type": "task_start", "summary": "Rekam suara di booth"}
+{"t": 214, "run": "0026-gempa-kecil-merusak", "agent": "ulza", "type": "done", "summary": "Rekaman selesai, 104 detik"}
+{"t": 215, "run": "0026-gempa-kecil-merusak", "agent": "producer", "type": "handoff", "summary": "Rekaman masuk, lanjut ke render", "to": "ops"}
+{"t": 219, "run": "0026-gempa-kecil-merusak", "agent": "ops", "type": "task_start", "summary": "Whisper large-v3, waktu kata", "model": "haiku", "effort": "low"}
+{"t": 226, "run": "0026-gempa-kecil-merusak", "agent": "ops", "type": "tool", "summary": "node waktu.mjs && node campur.mjs: -16 LUFS"}
+{"t": 234, "run": "0026-gempa-kecil-merusak", "agent": "ops", "type": "tool", "summary": "Render 1080x1920, 30 fps"}
+{"t": 246, "run": "0026-gempa-kecil-merusak", "agent": "ops", "type": "tool", "summary": "periksa-reel.mjs: resolusi, kata pertama, jeda OK"}
+{"t": 248, "run": "0026-gempa-kecil-merusak", "agent": "ops", "type": "cost", "usd": 0.002, "usage": {"in": 2000, "out": 400, "cache_read": 13000, "cache_write": 2000}}
+{"t": 249, "run": "0026-gempa-kecil-merusak", "agent": "ops", "type": "done", "summary": "video/0026-gempa-kecil-merusak.mp4 siap"}
+{"t": 250, "run": "0026-gempa-kecil-merusak", "agent": "scriptwriter", "type": "task_start", "summary": "Caption IG, judul TikTok dan YouTube (batch)", "model": "sonnet", "effort": "medium"}
+{"t": 256, "run": "0026-gempa-kecil-merusak", "agent": "scriptwriter", "type": "cost", "usd": 0.03, "usage": {"in": 2000, "out": 1500, "cache_read": 23000, "cache_write": 2000}}
+{"t": 257, "run": "0026-gempa-kecil-merusak", "agent": "scriptwriter", "type": "done", "summary": "caption-ig.md 1.840 karakter, 5 hashtag"}
+{"t": 258, "run": "0026-gempa-kecil-merusak", "agent": "producer", "type": "cost", "usd": 0.05, "usage": {"in": 3000, "out": 1500, "cache_read": 27000, "cache_write": 3000}}
+{"t": 260, "run": "0026-gempa-kecil-merusak", "agent": "producer", "type": "run_end", "status": "ok", "summary": "Reel 0026 siap tayang 20 Nov 07.30. Total $1.78"}
