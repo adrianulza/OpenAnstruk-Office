@@ -54,7 +54,7 @@ What the review of `main` @ `0e59155` found, and what changed in v2. Every fix i
 26. Outdated `cd office` docs: **fixed** (README, WORKFLOW, EVENTS).
 - Kanban hidden behind the run card: **fixed** (camera framing). Narrow-screen layout: **fixed**.
 - Speed button highlight, pinch zoom: **fixed**.
-- Pages workflow branch names not escaped: **fixed**. Tests and CI: **added** (`npm test`, `.github/workflows/test.yml`).
+- Pages workflow branch names not escaped: **fixed in `docs/ci/pages.yml`** (install by hand). Tests: **added** (`npm test`). CI workflow and the safer Pages workflow are in `docs/ci/` (the push token cannot write `.github/workflows`; copy them once, see `docs/ci/README.md`).
 
 ## Still open (by design or needs you)
 - Posting to Instagram, TikTok and YouTube is manual. The run prepares `publish.json` and the caption.
